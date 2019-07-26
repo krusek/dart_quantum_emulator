@@ -70,7 +70,7 @@ class Bank {
   }
 
   void release({List<Qubit> qubits}) {} // Not necessarily needed, but can be implemented for memory reasons.
-  void operate({List<Qubit> controls = const [], List<bool> controlModifiers, @required Qubit target, @required Operator operator}) {
+  void operate({@required Qubit target, @required Operator operator, List<Qubit> controls = const [], List<bool> controlModifiers,}) {
     if (controlModifiers == null) {
       controlModifiers = controls.map((_) => true).toList();
     }
@@ -89,13 +89,22 @@ class Bank {
       _data[tuple.one] = newData.one;
     }
   }
+
+  Measurement measure({@required Qubit target}) {
+    return Measurement.Zero;
+  }
+
+  Measurement measurement({@required List<Qubit> targets, @required List<Pauli> paulis}) {
+    return Measurement.Zero;
+  }
 }
 
 Iterable<IntTuple> indexes({List<int> controls = const [], List<int> anticontrols = const [], @required int target, @required int length}) sync* {
-  for (final i in range(0, pow(2, length - 1))) {
+  for (final i in range(0, pow(2, length-1))) {
     final s = i.toRadixString(2).padLeft(length - 1, "0");
-    final zero = s.substring(0, target) + "0" + s.substring(target);
-    final one = s.substring(0, target) + "1" + s.substring(target);
+    
+    final zero = length == 1 ? "0" : s.substring(0, target) + "0" + s.substring(target);
+    final one = length == 1 ? "1" : s.substring(0, target) + "1" + s.substring(target);
     final controlled = controls.every((ix) {
       return zero[ix] == "1";
     });
@@ -149,12 +158,44 @@ abstract class Operations {
 typedef Operator = ComplexTuple Function(ComplexTuple);
 
 final Operator X = (input) => ComplexTuple(zero: input.one, one: input.zero);
-final Operator Y = (input) => ComplexTuple(zero: Complex.I * input.one, one: -Complex.I * input.zero);
+final Operator Y = (input) => ComplexTuple(zero: -Complex.I * input.one, one: Complex.I * input.zero);
 final Operator Z = (input) => ComplexTuple(zero: input.zero, one: -input.one);
 final Operator H = (input) => ComplexTuple(zero: (input.zero + input.one) / sqrt(2.0), one: (input.zero - input.one) / sqrt(2.0));
 
+final Operator Function(double) rx = (theta) {
+  return (input) {
+    return ComplexTuple(
+      zero: input.zero * cos(theta / 2) - input.one * Complex.I * sin(theta / 2), 
+      one: input.one * cos(theta / 2) - input.zero * Complex.I * sin(theta / 2),
+    );
+  };
+};
+
+final Operator Function(double) ry = (theta) {
+  return (input) {
+    return ComplexTuple(
+      zero: input.zero * cos(theta / 2) - input.one * sin(theta / 2), 
+      one: input.one * cos(theta / 2) + input.zero * sin(theta / 2),
+    );
+  };
+};
+
+final Operator Function(double) rz = (theta) {
+  return (input) {
+    return ComplexTuple(
+      zero: input.zero * (Complex.ONE * cos(theta / 2) - Complex.I * sin(theta / 2)), 
+      one: input.one * (Complex.ONE * cos(theta / 2) + Complex.I * sin(theta / 2)),
+    );
+  };
+};
+
 class ComplexTuple extends Tuple<Complex, Complex> {
   ComplexTuple({Complex one, Complex zero}): super(one: one, zero: zero);
+}
+
+enum Measurement {
+  Zero,
+  One
 }
 
 enum Pauli {
