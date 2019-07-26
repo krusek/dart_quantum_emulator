@@ -11,10 +11,13 @@ class Vector {
     this(doubles.map((d) {return Complex(d);}).toList());
   
   double norm() {
-    final c = this.elements
+    return pow(normSquared(), 0.5);
+  }
+
+  double normSquared() {
+    return this.elements
       .map((c){return c*c.conjugate();})
       .reduce((c,d){return c+d;}).abs();
-    return pow(c, 0.5);
   }
 
   Vector normalized() {

@@ -71,6 +71,10 @@ class Bank {
 
   void release({List<Qubit> qubits}) {} // Not necessarily needed, but can be implemented for memory reasons.
   void operate({@required Qubit target, @required Operator operator, List<Qubit> controls = const [], List<bool> controlModifiers,}) {
+    _operate(target: target, operator: operator, controls: controls, controlModifiers: controlModifiers, data: _data);
+  }
+
+  void _operate({@required Qubit target, @required Operator operator, @required List<Complex> data, List<Qubit> controls = const [], List<bool> controlModifiers,}) {
     if (controlModifiers == null) {
       controlModifiers = controls.map((_) => true).toList();
     }
@@ -83,18 +87,35 @@ class Bank {
       .where((tuple) => !tuple.one)
       .map((tuple) => tuple.zero.index(length)).toList();
     for (final tuple in indexes(target: target.index(length), length: length, controls: oneControls, anticontrols: zeroControls)) {
-      final input = ComplexTuple(zero: _data[tuple.zero], one:_data[tuple.one]);
+      final input = ComplexTuple(zero: data[tuple.zero], one:data[tuple.one]);
       final newData = operator(input);
-      _data[tuple.zero] = newData.zero;
-      _data[tuple.one] = newData.one;
+      data[tuple.zero] = newData.zero;
+      data[tuple.one] = newData.one;
     }
   }
 
   Measurement measure({@required Qubit target}) {
-    return Measurement.Zero;
+    return measurement(targets: [target], operators: [Z]);
   }
 
-  Measurement measurement({@required List<Qubit> targets, @required List<Pauli> paulis}) {
+  Measurement measurement({@required List<Qubit> targets, @required List<Operator> operators}) {
+    assert(targets.length == operators.length);
+
+    final List<Complex> copy = List<Complex>.from(_data);
+    for (final pair in zip(targets, operators)) {
+      _operate(target: pair.zero, operator: pair.one, data: copy);
+    }
+    final Vector evaluated = Vector(copy);
+    final Vector original = Vector(_data);
+
+    final zeroVector = (original + evaluated) * 0.5;
+    final oneVector = (original - evaluated) * 0.5;
+
+    final zeroProbability = zeroVector.normSquared();
+    final oneProbability = oneVector.normSquared();
+
+    print("zeroProb: $zeroProbability, oneProb: $oneProbability");
+    
     return Measurement.Zero;
   }
 }
@@ -145,22 +166,13 @@ Iterable<int> range(int start, int end) sync* {
   }
 }
 
-abstract class Operations {
-  void x(Qubit q);
-  void y(Qubit q);
-  void z(Qubit q);
-  
-  void rx({double angle, Qubit q});
-  void ry({double angle, Qubit q});
-  void rz({double angle, Qubit q});
-}
-
 typedef Operator = ComplexTuple Function(ComplexTuple);
 
 final Operator X = (input) => ComplexTuple(zero: input.one, one: input.zero);
 final Operator Y = (input) => ComplexTuple(zero: -Complex.I * input.one, one: Complex.I * input.zero);
 final Operator Z = (input) => ComplexTuple(zero: input.zero, one: -input.one);
 final Operator H = (input) => ComplexTuple(zero: (input.zero + input.one) / sqrt(2.0), one: (input.zero - input.one) / sqrt(2.0));
+final Operator I = (input) => ComplexTuple(zero: input.zero, one: input.one);
 
 final Operator Function(double) rx = (theta) {
   return (input) {
@@ -196,13 +208,6 @@ class ComplexTuple extends Tuple<Complex, Complex> {
 enum Measurement {
   Zero,
   One
-}
-
-enum Pauli {
-  PauliX,
-  PauliY,
-  PauliZ,
-  PauliI
 }
 
 

@@ -19,26 +19,26 @@ void main() {
       Bank bank = Bank();
       Qubit qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: Y);
-      print("|0> -> " + bank.toString());
+      expect(bank.toString(), "(0.0, 1.0) |1>");
       
       bank = Bank();
       qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: X);
       bank.operate(target: qubit, operator: Y);
-      print("|1> -> " + bank.toString());
+      expect(bank.toString(), "(0.0, -1.0) |0>");
     });
 
     test('test Z', () {
       Bank bank = Bank();
       Qubit qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: Z);
-      print("|0> -> " + bank.toString());
+      expect(bank.toString(), "(1.0, 0.0) |0>");
       
       bank = Bank();
       qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: X);
       bank.operate(target: qubit, operator: Z);
-      print("|1> -> " + bank.toString());
+      expect(bank.toString(), "(-1.0, -0.0) |1>");
     });
 
     test('test operators', () {
@@ -114,6 +114,24 @@ void main() {
         indexes(controls: [0,2], target: 1, length: 4),
         [IntTuple(zero: 10, one: 14),IntTuple(zero: 11, one: 15),]
       );
+    });
+  });
+
+  group("Measurements", () {
+    test("measurement playground", () {
+      final bank = Bank();
+      final qubits = bank.borrowQubits(length:2);
+
+      bank.measure(target:qubits[0]);
+      bank.operate(target: qubits[0], operator: H);      
+      bank.measure(target:qubits[0]);
+
+      bank.operate(target: qubits[1], controls: [qubits[0]], operator: X);
+      bank.measure(target:qubits[1]);
+
+      bank.measurement(targets: qubits, paulis: [Pauli.PauliZ, Pauli.PauliZ]);
+
+      bank.measurement(targets: qubits, paulis: [Pauli.PauliZ, Pauli.PauliX]);
     });
   });
 }
