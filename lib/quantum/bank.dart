@@ -96,10 +96,10 @@ class Bank {
     assert(controls.length == controlModifiers.length);
     final length = _qubits.length;
     final oneControls = zip(controls, controlModifiers)
-      .where((tuple) => !tuple.one)
+      .where((tuple) => tuple.one)
       .map((tuple) => tuple.zero.index(length)).toList();
     final zeroControls = zip(controls, controlModifiers)
-      .where((tuple) => tuple.one)
+      .where((tuple) => !tuple.one)
       .map((tuple) => tuple.zero.index(length)).toList();
     for (final tuple in indexes(target: target.index(length), length: length, controls: oneControls, anticontrols: zeroControls)) {
       final input = ComplexTuple(zero: data[tuple.zero], one:data[tuple.one]);
@@ -117,6 +117,10 @@ class Bank {
   /// Measures the qubit array, [targets] with respect to the
   /// input [operators].
   /// The two arrays must be the same length.
+  /// 
+  /// *NOTE*: This assumes that the tensor product of the operators has 
+  /// eigenvalues 1 and -1. As some point may replace [operators] with
+  /// an enumeration to limit it to H, X, Y, and Z.
   Measurement measurement({@required List<Qubit> targets, @required List<Operator> operators}) {
     assert(targets.length == operators.length);
 
@@ -131,9 +135,7 @@ class Bank {
     final oneVector = (original - evaluated) * 0.5;
 
     final zeroProbability = zeroVector.normSquared();
-    final oneProbability = oneVector.normSquared();
 
-    print("zeroProb: $zeroProbability, oneProb: $oneProbability");
     final r = _generator();
     if (r < zeroProbability) {
       _data = zeroVector.normalized().elements;

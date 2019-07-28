@@ -130,12 +130,12 @@ void main() {
 
   group('H measurements', () {
     test('zero measurement', () {
-      final list = range(0, 500).map((f) => f / 100.0).toList();
+      final list = range(0, 499).map((f) => f / 1000.0).toList();
       final generator = Generator(elements: list);
 
       final bank = Bank(generator: generator.nextDouble);
       final qubit = bank.borrowQubits(length: 1)[0];
-      for (final _ in list) {
+      for (final ix in list) {
         bank.operate(target: qubit, operator: H);
         bank.measure(target: qubit);
         expect(bank.toString(), "(1.0, 0.0) |0>");
@@ -143,7 +143,7 @@ void main() {
     });
 
     test('zero measurement', () {
-      final list = range(501, 1000).map((f) => f / 100.0).toList();
+      final list = range(501, 1000).map((f) => f / 1000.0).toList();
       final generator = Generator(elements: list);
 
       final bank = Bank(generator: generator.nextDouble);
