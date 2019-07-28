@@ -44,6 +44,7 @@ class Bank {
 
   Bank({double Function() generator}) : _generator = generator;
 
+  /// Returns a list of unused qubits of the given [length].
   List<Qubit> borrowQubits({int length}) {
     assert(length > 0);
     final l = _qubits.length;
@@ -61,11 +62,6 @@ class Bank {
     return _qubits.sublist(l);
   }
 
-  void H() {
-    _data[0] = Complex(1.0 / sqrt(2));
-    _data[1] = Complex(1.0 / sqrt(2));
-  }
-
   String toString() {
     final monomials = range(0, _data.length).map((i) {
       final d = _data[i];
@@ -79,6 +75,16 @@ class Bank {
   }
 
   void release({List<Qubit> qubits}) {} // Not necessarily needed, but can be implemented for memory reasons.
+
+  /// Performs the given [operator] on the [target] qubit.
+  /// 
+  /// If [controls] are specified then those qubits will be used as controls.
+  /// The [target] qubit cannot be contained in the [controls] list. When the 
+  /// additional array [controlModifiers] is not supplied then the operation
+  /// will be controlled on [controls] being |1>. Otherwise [controlModifiers]
+  /// can be used to decide whether the respective [controls] qubits are |1>
+  /// where [controlModifiers] is true and |0> where [controlModifiers] is
+  /// false.
   void operate({@required Qubit target, @required Operator operator, List<Qubit> controls = const [], List<bool> controlModifiers,}) {
     _operate(target: target, operator: operator, controls: controls, controlModifiers: controlModifiers, data: _data);
   }
@@ -103,10 +109,14 @@ class Bank {
     }
   }
 
+  /// Measures the [target] qubit with respect to the Z operator.
   Measurement measure({@required Qubit target}) {
     return measurement(targets: [target], operators: [Z]);
   }
 
+  /// Measures the qubit array, [targets] with respect to the
+  /// input [operators].
+  /// The two arrays must be the same length.
   Measurement measurement({@required List<Qubit> targets, @required List<Operator> operators}) {
     assert(targets.length == operators.length);
 
@@ -127,16 +137,59 @@ class Bank {
     final r = _generator();
     if (r < zeroProbability) {
       _data = zeroVector.normalized().elements;
-    return Measurement.Zero;
+      return Measurement.Zero;
     } else {
       oneVector.normalized();
       _data = oneVector.normalized().elements;
       return Measurement.One;
+    }
   }
 }
-}
 
-Iterable<IntTuple> indexes({List<int> controls = const [], List<int> anticontrols = const [], @required int target, @required int length}) sync* {
+/// Creates an iterator over boolean integers.
+/// 
+/// This method returns all integers of boolean [length]
+/// paired up with the [target] index being |0> or |1>.
+/// For example, when [target] = 1 and [length] = 3 you get
+/// (the order is not guaranteed):
+/// ```
+/// [
+///   (0x000, 0x010),
+///   (0x001, 0x011),
+///   (0x100, 0x110),
+///   (0x101, 0x111)
+/// ]
+/// ```
+/// 
+/// The indexes are zero based and start from the left. That means
+/// when [target]=0 and [length]=3 you get:
+/// ```
+/// [
+///   (0x000, 0x100),
+///   (0x001, 0x101),
+///   (0x010, 0x110),
+///   (0x011, 0x111)
+/// ]
+/// ```
+/// 
+/// The other parameters can be used to remove some pairs from the
+/// iterator. For each integer in [controls] we restrict the tuples
+/// to pairs where those indexes are 1. For example when
+/// [length]=3, [target]=0, and [controls] contains only 1 then we cut
+/// the list in half and have:
+/// ```
+/// [
+///   (0x010, 0x110),
+///   (0x011, 0x111)
+/// ]
+/// ```
+/// 
+/// In a similar fashion [anticontrols] can be used to limit to
+/// tuples where the output pairs are zero at the given indices.
+/// 
+/// It is an error for [target] to be contained in either [controls]
+/// or [anticontrols].
+Iterable<IntTuple> indexes({@required int target, @required int length, List<int> controls = const [], List<int> anticontrols = const [],}) sync* {
   for (final i in range(0, pow(2, length-1))) {
     final s = i.toRadixString(2).padLeft(length - 1, "0");
     

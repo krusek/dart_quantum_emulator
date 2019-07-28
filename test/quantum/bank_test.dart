@@ -165,7 +165,7 @@ void main() {
       print(bank.toString());
       bank.measure(target:qubits[0]);
       print(bank.toString());
-      bank.operate(target: qubits[0], operator: H);      
+      bank.operate(target: qubits[0], operator: H);  
       print(bank.toString());    
       bank.measure(target:qubits[0]);
       print(bank.toString());
