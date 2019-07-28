@@ -2,12 +2,23 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quantum_emulator/quantum/bank.dart';
 
+class Generator {
+  final List<double> elements;
+  int _index = -1;
+  Generator({this.elements});
+
+  double nextDouble() {
+    _index = (_index + 1) % elements.length;
+    return elements[_index];
+  }
+}
+
 void main() {
   group('Playground Qubits tests -- these tests assert nothing and will add assertions later', () {
     test('test', () {
-      final bank = Bank();
-      bank.borrowQubits(length: 1);
-      bank.H();
+      final bank = Bank.create();
+      final qubit = bank.borrowQubits(length: 1)[0];
+      bank.operate(target: qubit, operator: H);
       print("1: " + bank.toString());
       bank.borrowQubits(length: 1);
       print("2: " + bank.toString());
@@ -16,12 +27,12 @@ void main() {
     });
 
     test('test Y', () {
-      Bank bank = Bank();
+      Bank bank = Bank.create();
       Qubit qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: Y);
       expect(bank.toString(), "(0.0, 1.0) |1>");
       
-      bank = Bank();
+      bank = Bank.create();
       qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: X);
       bank.operate(target: qubit, operator: Y);
@@ -29,12 +40,12 @@ void main() {
     });
 
     test('test Z', () {
-      Bank bank = Bank();
+      Bank bank = Bank.create();
       Qubit qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: Z);
       expect(bank.toString(), "(1.0, 0.0) |0>");
       
-      bank = Bank();
+      bank = Bank.create();
       qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: X);
       bank.operate(target: qubit, operator: Z);
@@ -42,7 +53,7 @@ void main() {
     });
 
     test('test operators', () {
-      final bank = Bank();
+      final bank = Bank.create();
       final qubits = bank.borrowQubits(length:3);
       print(bank.toString());
       bank.operate(target: qubits[0], operator: H);
@@ -56,7 +67,7 @@ void main() {
     });
 
     test('test controlled operators', () {
-      final bank = Bank();
+      final bank = Bank.create();
       final qubits = bank.borrowQubits(length:3);
       print(bank.toString());
       bank.operate(target: qubits[0], controls: [qubits[1]], operator: H);
@@ -117,21 +128,58 @@ void main() {
     });
   });
 
+  group('H measurements', () {
+    test('zero measurement', () {
+      final list = range(0, 500).map((f) => f / 100.0).toList();
+      final generator = Generator(elements: list);
+
+      final bank = Bank(generator: generator.nextDouble);
+      final qubit = bank.borrowQubits(length: 1)[0];
+      for (final _ in list) {
+        bank.operate(target: qubit, operator: H);
+        bank.measure(target: qubit);
+        expect(bank.toString(), "(1.0, 0.0) |0>");
+      }
+    });
+
+    test('zero measurement', () {
+      final list = range(501, 1000).map((f) => f / 100.0).toList();
+      final generator = Generator(elements: list);
+
+      final bank = Bank(generator: generator.nextDouble);
+      final qubit = bank.borrowQubits(length: 1)[0];
+      for (final _ in list) {
+        bank.operate(target: qubit, operator: H);
+        bank.measure(target: qubit);
+        bank.operate(target: qubit, operator: X);
+        expect(bank.toString(), "(1.0, 0.0) |0>");
+      }
+    });
+  });
+
   group("Measurements", () {
     test("measurement playground", () {
-      final bank = Bank();
+      final bank = Bank.create(0);
       final qubits = bank.borrowQubits(length:2);
 
+      print(bank.toString());
       bank.measure(target:qubits[0]);
+      print(bank.toString());
       bank.operate(target: qubits[0], operator: H);      
+      print(bank.toString());    
       bank.measure(target:qubits[0]);
+      print(bank.toString());
 
       bank.operate(target: qubits[1], controls: [qubits[0]], operator: X);
+      print(bank.toString());
       bank.measure(target:qubits[1]);
+      print(bank.toString());
 
-      bank.measurement(targets: qubits, paulis: [Pauli.PauliZ, Pauli.PauliZ]);
+      bank.measurement(targets: qubits, operators: [Z, Z]);
+      print(bank.toString());
 
-      bank.measurement(targets: qubits, paulis: [Pauli.PauliZ, Pauli.PauliX]);
+      bank.measurement(targets: qubits, operators: [Z, X]);
+      print(bank.toString());
     });
   });
 }

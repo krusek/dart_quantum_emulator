@@ -49,5 +49,8 @@ void main() {
     });
   });
 
-
+  test('complex zero', () {
+    final zero = Complex.ZERO;
+    expect(zero, zero * -1);
+  });
 }

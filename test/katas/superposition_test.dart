@@ -3,7 +3,7 @@ import 'package:quantum_emulator/quantum/bank.dart';
 
 void main() {
   group("task 5", () {
-    final bank = Bank();
+    final bank = Bank.create();
     void task(List<Qubit> qubits) {
       bank.operate(target:qubits[0], operator: H);
       bank.operate(target:qubits[1], operator: H);

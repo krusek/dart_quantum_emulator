@@ -6,7 +6,7 @@ void main() {
   group('basic gates', () {
     Bank bank;
     setUp(() {
-      bank = Bank();
+      bank = Bank.create();
     });
     group("task 1 -- |0> -> |1>, |1> -> |0>", () {
       Qubit qubit;
