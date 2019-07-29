@@ -33,19 +33,23 @@ class Qubit {
 }
 
 class Bank {
+  final bool _debugForLearning;
   final double Function() _generator;
   List<Qubit> _qubits = List<Qubit>.filled(0, Qubit(index: 0), growable: true);
   List<Complex> _data = List<Complex>.generate(1, (i) => i == 0 ? Complex.ONE : Complex.ZERO);
 
-  static Bank create([int seed]) {
+  static Bank create({int seed, bool debug = false}) {
     final Random random = Random(seed);
-    return Bank(generator: random.nextDouble);
+    return Bank(generator: random.nextDouble, debug: debug);
   }
 
-  Bank({double Function() generator}) : _generator = generator;
+  Bank({double Function() generator, bool debug = false}) : 
+    _generator = generator,
+    _debugForLearning = debug;
 
   /// Returns a list of unused qubits of the given [length].
   List<Qubit> borrowQubits({int length}) {
+    print("acquiring $length qubits.");
     assert(length > 0);
     final l = _qubits.length;
     
@@ -67,7 +71,7 @@ class Bank {
       final d = _data[i];
       if (d != Complex.ZERO) {
         final binary = i.toRadixString(2).padLeft(_qubits.length, "0").split('').reversed.join();
-        return "$d |$binary>";
+        return "${d.abs() * d.abs()} |$binary>";
       }
       return null;
     }).where((x) => x != null);
@@ -87,6 +91,12 @@ class Bank {
   /// false.
   void operate({@required Qubit target, @required Operator operator, List<Qubit> controls = const [], List<bool> controlModifiers,}) {
     _operate(target: target, operator: operator, controls: controls, controlModifiers: controlModifiers, data: _data);
+    if (_debugForLearning) {
+      final vector = Vector(this._data);
+      final normalized = vector.normalized();
+      this._data = normalized.elements;
+      print("$this");
+    }
   }
 
   void _operate({@required Qubit target, @required Operator operator, @required List<Complex> data, List<Qubit> controls = const [], List<bool> controlModifiers,}) {
@@ -109,20 +119,17 @@ class Bank {
     }
   }
 
-  /// Measures the [target] qubit with respect to the Z operator.
+  /// Measures the [target] qubit with respect to the Z Pauli operator.
   Measurement measure({@required Qubit target}) {
-    return measurement(targets: [target], operators: [Z]);
+    return measurement(targets: [target], paulis: [Pauli.PauliZ]);
   }
 
   /// Measures the qubit array, [targets] with respect to the
-  /// input [operators].
+  /// input [paulis].
   /// The two arrays must be the same length.
-  /// 
-  /// *NOTE*: This assumes that the tensor product of the operators has 
-  /// eigenvalues 1 and -1. As some point may replace [operators] with
-  /// an enumeration to limit it to H, X, Y, and Z.
-  Measurement measurement({@required List<Qubit> targets, @required List<Operator> operators}) {
-    assert(targets.length == operators.length);
+  Measurement measurement({@required List<Qubit> targets, @required List<Pauli> paulis}) {
+    assert(targets.length == paulis.length);
+    final operators = paulis.map((p) => _operator(pauli: p));
 
     final List<Complex> copy = List<Complex>.from(_data);
     for (final pair in zip(targets, operators)) {
@@ -144,6 +151,17 @@ class Bank {
       oneVector.normalized();
       _data = oneVector.normalized().elements;
       return Measurement.One;
+    }
+  }
+
+  Operator _operator({Pauli pauli}) {
+    switch(pauli) {
+      case Pauli.PauliX:
+      return X;
+      case Pauli.PauliY:
+      return Y;
+      case Pauli.PauliZ:
+      return Z;
     }
   }
 
@@ -286,6 +304,16 @@ Iterable<int> range(int start, int end) sync* {
     yield i;
   }
 }
+
+enum Pauli {
+  PauliX,
+  PauliY,
+  PauliZ,
+}
+
+final PauliX = Pauli.PauliX;
+final PauliY = Pauli.PauliY;
+final PauliZ = Pauli.PauliZ;
 
 typedef Operator = ComplexTuple Function(ComplexTuple);
 

@@ -157,11 +157,21 @@ void main() {
         expect([Complex.ONE,], bank);
       }
     });
+
+    test('playground', () {
+      final bank = Bank.create(debug: true);
+      final qubits = bank.borrowQubits(length: 3);
+      bank.operate(target: qubits[0], operator: X);
+      bank.operate(target: qubits[1], operator: X);
+      bank.operate(target: qubits[2], operator: H);
+      bank.operate(target: qubits[0], operator: H);
+      bank.operate(target: qubits[1], operator: X);
+    });
   });
 
   group("Measurements", () {
     test("measurement playground", () {
-      final bank = Bank.create(0);
+      final bank = Bank.create(seed: 0);
       final qubits = bank.borrowQubits(length:2);
 
       bank.measure(target:qubits[0]);
@@ -179,11 +189,11 @@ void main() {
       expect({3:1.0}, bank);
       expect(m, Measurement.One);
       
-      m = bank.measurement(targets: qubits, operators: [Z, Z]);
+      m = bank.measurement(targets: qubits, paulis: [PauliZ, PauliZ]);
       expect({3:1.0}, bank);
       expect(m, Measurement.Zero);
 
-      m = bank.measurement(targets: qubits, operators: [Z, X]);
+      m = bank.measurement(targets: qubits, paulis: [PauliZ, PauliX]);
       expect({1: sqrt1_2, 3: sqrt1_2}, bank);
       expect(m, Measurement.One);
     });
