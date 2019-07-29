@@ -146,6 +146,56 @@ class Bank {
       return Measurement.One;
     }
   }
+
+  @visibleForTesting
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other is List<Complex>) { 
+      final List<Complex> data = other;
+      final norm = zip(data, this._data).map((tuple) {
+        return (tuple.zero - tuple.one).abs();
+      }).reduce((a, b) => a + b);
+      return norm < 1e-6;
+    } else if (other is List<double>) { 
+      final List<double> data = other;
+      final norm = zip(data, this._data).map((tuple) {
+        return (Complex(tuple.zero) - tuple.one).abs();
+      }).reduce((a, b) => a + b);
+      return norm < 1e-6;
+    } else if (other is Map<String, Complex>) {
+      var comp = Map<int, Complex>();
+      for (final key in other.keys) {
+        final value = int.tryParse(key, radix: 2);
+        if (value == null) return false;
+        comp[value] = other[key];
+      }
+      return _mapEquality(comp);
+    } else if (other is Map<int, Complex>) {
+      return _mapEquality(other);
+    } else if (other is Map<int, double>) {
+      var comp = other.map((ix, db) {
+        return MapEntry<int, Complex>(ix, Complex(db));
+      });
+      return _mapEquality(comp);
+    } else {
+      return false;
+    }
+  }
+
+  bool _mapEquality(Map<int, Complex> other) {
+    final norm = other.keys.map((key) {
+      return (other[key] - this._data[key]).abs();
+    }).reduce((a,b) => a+b);
+    return norm < 1e-6;
+  }
+
+  @visibleForTesting
+  int get hashCode {
+    if (this._data.length == 0) { return 0; }
+    return this._data.map((f) => f.hashCode).reduce((i,j) => i+j);
+  }
 }
 
 /// Creates an iterator over boolean integers.

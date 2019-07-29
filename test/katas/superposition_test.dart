@@ -1,3 +1,4 @@
+import 'package:complex/complex.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quantum_emulator/quantum/bank.dart';
 
@@ -15,7 +16,12 @@ void main() {
     test("|00> -> (|00> + i|01> - |10> - i|11>)/2", () {
       final qubits = bank.borrowQubits(length: 2);
       task(qubits);
-      expect(bank.toString(), "(0.49999999999999994, 0.0) |00> + (-0.49999999999999994, -0.0) |10> + (-0.0, 0.49999999999999994) |01> + (-0.0, -0.49999999999999994) |11>");
+      expect([
+        Complex(0.5),
+        Complex(-0.5),
+        Complex(0, 0.5),
+        Complex(0, -0.5)
+      ], bank);
     });
   });
 }

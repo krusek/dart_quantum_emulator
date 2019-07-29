@@ -1,4 +1,6 @@
+import 'dart:math';
 
+import 'package:complex/complex.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quantum_emulator/quantum/bank.dart';
 
@@ -20,12 +22,12 @@ void main() {
 
       test("|0> -> |1>", () {
         task(qubit);
-        expect(bank.toString(), "(1.0, 0.0) |1>");
+        expect({1: Complex.ONE}, bank);
       });
       test("|1> -> |0>", () {
         task(qubit);
         task(qubit);
-        expect(bank.toString(), "(1.0, 0.0) |0>");
+        expect([Complex.ONE], bank);
       });
     });
     group("task 2 -- |0> -> |+>, |1> -> |->", () {
@@ -40,13 +42,13 @@ void main() {
 
       test("task 2 -- |0> -> |+>,", () {
         task(qubit);
-        expect(bank.toString(), "(0.7071067811865475, 0.0) |0> + (0.7071067811865475, 0.0) |1>");
+        expect([Complex(sqrt1_2), Complex(sqrt1_2)], bank);
       });
 
       test("task 2 -- |1> -> |->", () {
         bank.operate(target: qubit, operator: X);
         task(qubit);
-        expect(bank.toString(), "(0.7071067811865475, 0.0) |0> + (-0.7071067811865475, 0.0) |1>");
+        expect([Complex(sqrt1_2), -Complex(sqrt1_2)], bank);
       });
     });
 
@@ -63,14 +65,14 @@ void main() {
       test("|+> -> |->", () {
         bank.operate(target: qubit, operator: H);
         task(qubit);
-        expect(bank.toString(), "(0.7071067811865475, 0.0) |0> + (-0.7071067811865475, -0.0) |1>");
+        expect([Complex(sqrt1_2), -Complex(sqrt1_2)], bank);
       });
 
       test("|+> -> |->", () {
         bank.operate(target: qubit, operator: H);
         task(qubit);
         task(qubit);
-        expect(bank.toString(), "(0.7071067811865475, 0.0) |0> + (0.7071067811865475, 0.0) |1>");
+        expect([Complex(sqrt1_2), Complex(sqrt1_2)], bank);
       });
     });
 
@@ -84,18 +86,18 @@ void main() {
       test("swap |01> and |10>", () {
         List<Qubit> qubits = bank.borrowQubits(length: 2);
         task(qubits);
-        expect(bank.toString(), "(1.0, 0.0) |00>");
+        expect([Complex.ONE], bank);
 
         bank.operate(target: qubits[0], operator: X);
         task(qubits);
-        expect(bank.toString(), "(1.0, 0.0) |01>");
+        expect({2: Complex.ONE}, bank);
         task(qubits);
-        expect(bank.toString(), "(1.0, 0.0) |10>");
+        expect({1: Complex.ONE}, bank);
 
 
         bank.operate(target: qubits[1], operator: X);
         task(qubits);
-        expect(bank.toString(), "(1.0, 0.0) |11>");
+        expect({3: Complex.ONE}, bank);
       });
     });
   });

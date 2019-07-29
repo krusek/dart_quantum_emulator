@@ -1,4 +1,7 @@
 
+import 'dart:math';
+
+import 'package:complex/complex.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quantum_emulator/quantum/bank.dart';
 
@@ -19,67 +22,66 @@ void main() {
       final bank = Bank.create();
       final qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: H);
-      print("1: " + bank.toString());
+      expect([sqrt1_2, sqrt1_2], bank);
       bank.borrowQubits(length: 1);
-      print("2: " + bank.toString());
+      expect([sqrt1_2, sqrt1_2], bank);
       bank.borrowQubits(length: 1);
-      print("3: " + bank.toString());
+      expect([sqrt1_2, sqrt1_2], bank);
     });
 
     test('test Y', () {
       Bank bank = Bank.create();
       Qubit qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: Y);
-      expect(bank.toString(), "(0.0, 1.0) |1>");
+      expect({1: Complex.I}, bank);
       
       bank = Bank.create();
       qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: X);
       bank.operate(target: qubit, operator: Y);
-      expect(bank.toString(), "(0.0, -1.0) |0>");
+      expect([-Complex.I], bank);
     });
 
     test('test Z', () {
       Bank bank = Bank.create();
       Qubit qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: Z);
-      expect(bank.toString(), "(1.0, 0.0) |0>");
+      expect([Complex.ONE], bank);
       
       bank = Bank.create();
       qubit = bank.borrowQubits(length: 1)[0];
       bank.operate(target: qubit, operator: X);
       bank.operate(target: qubit, operator: Z);
-      expect(bank.toString(), "(-1.0, -0.0) |1>");
+      expect([Complex.ZERO, -Complex.ONE], bank);
     });
 
     test('test operators', () {
       final bank = Bank.create();
       final qubits = bank.borrowQubits(length:3);
-      print(bank.toString());
       bank.operate(target: qubits[0], operator: H);
-      print(bank.toString());
+      expect([sqrt1_2, sqrt1_2], bank);
       bank.operate(target: qubits[1], operator: X);
-      print(bank.toString());
+      expect({2: sqrt1_2, 3: sqrt1_2}, bank);
       bank.operate(target: qubits[1], operator: H);
-      print(bank.toString());
+      expect([0.5, 0.5, -0.5, -0.5], bank);
       bank.borrowQubits(length:2);
-      print(bank.toString());
+      expect([0.5, 0.5, -0.5, -0.5], bank);
     });
 
     test('test controlled operators', () {
       final bank = Bank.create();
       final qubits = bank.borrowQubits(length:3);
-      print(bank.toString());
+      expect([1.0], bank);
       bank.operate(target: qubits[0], controls: [qubits[1]], operator: H);
-      print(bank.toString());
+      expect([1.0], bank);
       bank.operate(target: qubits[0], operator: H);
-      print(bank.toString());
+      expect([sqrt1_2, sqrt1_2], bank);
       bank.operate(target: qubits[1], controls: [qubits[0]], operator: X);
-      print(bank.toString());
+      expect({0:sqrt1_2, 3:sqrt1_2}, bank);
       bank.operate(target: qubits[1], operator: H);
-      print(bank.toString());
+      expect({0:0.5, 1:0.5, 2:0.5, 3:-0.5}, bank);
       bank.borrowQubits(length:2);
-      print(bank.toString());
+      expect({0:0.5, 1:0.5, 2:0.5, 3:-0.5}, bank);
     });
   });
 
@@ -135,10 +137,10 @@ void main() {
 
       final bank = Bank(generator: generator.nextDouble);
       final qubit = bank.borrowQubits(length: 1)[0];
-      for (final ix in list) {
+      for (final _ in list) {
         bank.operate(target: qubit, operator: H);
         bank.measure(target: qubit);
-        expect(bank.toString(), "(1.0, 0.0) |0>");
+        expect([Complex.ONE], bank);
       }
     });
 
@@ -152,7 +154,7 @@ void main() {
         bank.operate(target: qubit, operator: H);
         bank.measure(target: qubit);
         bank.operate(target: qubit, operator: X);
-        expect(bank.toString(), "(1.0, 0.0) |0>");
+        expect([Complex.ONE,], bank);
       }
     });
   });
@@ -162,24 +164,28 @@ void main() {
       final bank = Bank.create(0);
       final qubits = bank.borrowQubits(length:2);
 
-      print(bank.toString());
       bank.measure(target:qubits[0]);
-      print(bank.toString());
-      bank.operate(target: qubits[0], operator: H);  
-      print(bank.toString());    
-      bank.measure(target:qubits[0]);
-      print(bank.toString());
+      expect([1.0], bank);
+      bank.operate(target: qubits[0], operator: H); 
+      expect([sqrt1_2, sqrt1_2], bank);     
+      var m = bank.measure(target:qubits[0]);
+      expect({1:1.0}, bank);
+      expect(m, Measurement.One);
 
       bank.operate(target: qubits[1], controls: [qubits[0]], operator: X);
-      print(bank.toString());
-      bank.measure(target:qubits[1]);
-      print(bank.toString());
+      expect({3:1.0}, bank);
+      
+      m = bank.measure(target:qubits[1]);
+      expect({3:1.0}, bank);
+      expect(m, Measurement.One);
+      
+      m = bank.measurement(targets: qubits, operators: [Z, Z]);
+      expect({3:1.0}, bank);
+      expect(m, Measurement.Zero);
 
-      bank.measurement(targets: qubits, operators: [Z, Z]);
-      print(bank.toString());
-
-      bank.measurement(targets: qubits, operators: [Z, X]);
-      print(bank.toString());
+      m = bank.measurement(targets: qubits, operators: [Z, X]);
+      expect({1: sqrt1_2, 3: sqrt1_2}, bank);
+      expect(m, Measurement.One);
     });
   });
 }
