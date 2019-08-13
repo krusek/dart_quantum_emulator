@@ -71,7 +71,10 @@ class Bank {
       final d = _data[i];
       if (d != Complex.ZERO) {
         final binary = i.toRadixString(2).padLeft(_qubits.length, "0").split('').reversed.join();
-        return "${d.abs() * d.abs()} |$binary>";
+        if (this._debugForLearning) 
+          return "${d.abs() * d.abs()} |$binary>";
+        else
+          return "${d} |$binary>";
       }
       return null;
     }).where((x) => x != null);
@@ -121,25 +124,28 @@ class Bank {
 
   /// Measures the [target] qubit with respect to the Z Pauli operator.
   Measurement measure({@required Qubit target}) {
-    return measurement(targets: [target], paulis: [Pauli.PauliZ]);
+    return measurement(targets: [target], operators: [mz]);
   }
 
   /// Measures the qubit array, [targets] with respect to the
   /// input [paulis].
   /// The two arrays must be the same length.
-  Measurement measurement({@required List<Qubit> targets, @required List<Pauli> paulis}) {
-    assert(targets.length == paulis.length);
-    final operators = paulis.map((p) => _operator(pauli: p));
+  Measurement measurement({@required List<Qubit> targets, @required List<MeasurableOperator> operators}) {
+    assert(targets.length == operators.length);
+    assert(targets.length > 0);
 
     final List<Complex> copy = List<Complex>.from(_data);
     for (final pair in zip(targets, operators)) {
-      _operate(target: pair.zero, operator: pair.one, data: copy);
+      _operate(target: pair.zero, operator: pair.one.operator, data: copy);
     }
     final Vector evaluated = Vector(copy);
     final Vector original = Vector(_data);
 
-    final zeroVector = (original + evaluated) * 0.5;
-    final oneVector = (original - evaluated) * 0.5;
+    final zeroEigenvalue = _zeroEigenvalue(operators);
+    final oneEigenvalue = _oneEigenvalue(operators);
+
+    final zeroVector = (original - evaluated * oneEigenvalue) / (zeroEigenvalue - oneEigenvalue);
+    final oneVector = (original - evaluated * zeroEigenvalue) / (zeroEigenvalue - oneEigenvalue);
 
     final zeroProbability = zeroVector.normSquared();
 
@@ -154,15 +160,22 @@ class Bank {
     }
   }
 
-  Operator _operator({Pauli pauli}) {
-    switch(pauli) {
-      case Pauli.PauliX:
-      return X;
-      case Pauli.PauliY:
-      return Y;
-      case Pauli.PauliZ:
-      return Z;
+  Complex _zeroEigenvalue(List<MeasurableOperator> operators) {
+    if (operators.length == 1) {
+      return operators[0].eigenvalue1;
     }
+    final allSimple = operators.map((f) => f.eigenvalue1 == Complex.ONE).reduce((a, b) => a && b);
+    assert(allSimple);
+    return Complex.ONE;
+  }
+
+  Complex _oneEigenvalue(List<MeasurableOperator> operators) {
+    if (operators.length == 1) {
+      return operators[0].eigenvalue2;
+    }
+    final allSimple = operators.map((f) => f.eigenvalue2 == -Complex.ONE).reduce((a, b) => a && b);
+    assert(allSimple);
+    return -Complex.ONE;
   }
 
   @visibleForTesting
@@ -170,12 +183,10 @@ class Bank {
     if (identical(this, other)) {
       return true;
     }
-    if (other is List<Complex>) { 
-      final List<Complex> data = other;
-      final norm = zip(data, this._data).map((tuple) {
-        return (tuple.zero - tuple.one).abs();
-      }).reduce((a, b) => a + b);
-      return norm < 1e-6;
+    if (other is Bank) {
+      return _listEquality(other._data);
+    } else if (other is List<Complex>) { 
+      return _listEquality(other);
     } else if (other is List<double>) { 
       final List<double> data = other;
       final norm = zip(data, this._data).map((tuple) {
@@ -200,6 +211,14 @@ class Bank {
     } else {
       return false;
     }
+  }
+
+  bool _listEquality(List<Complex> other) {
+    final List<Complex> data = other;
+      final norm = zip(data, this._data).map((tuple) {
+        return (tuple.zero - tuple.one).abs();
+      }).reduce((a, b) => a + b);
+      return norm < 1e-6;
   }
 
   bool _mapEquality(Map<int, Complex> other) {
@@ -305,15 +324,42 @@ Iterable<int> range(int start, int end) sync* {
   }
 }
 
-enum Pauli {
-  PauliX,
-  PauliY,
-  PauliZ,
+class MeasurableOperator extends MeasureableOperator2 {
+  // final Operator operator;
+  final Complex eigenvalue1;
+  final Complex eigenvalue2;
+
+  MeasurableOperator({Operator operator, this.eigenvalue1, this.eigenvalue2}):
+  super(operator: operator, eigenvalues: [eigenvalue1, eigenvalue2]);
 }
 
-final PauliX = Pauli.PauliX;
-final PauliY = Pauli.PauliY;
-final PauliZ = Pauli.PauliZ;
+class MeasureableOperator2 {
+  final Operator operator;
+  final List<Complex> eigenvalues;
+
+  MeasureableOperator2({this.operator, this.eigenvalues});
+}
+
+final double pi = 3.141592653589793238462643383279502884197169399375105820974944;
+final mx = MeasurableOperator(operator: X, eigenvalue1: Complex.ONE, eigenvalue2: -Complex.ONE);
+final my = MeasurableOperator(operator: Y, eigenvalue1: Complex.ONE, eigenvalue2: -Complex.ONE);
+final mz = MeasurableOperator(operator: Z, eigenvalue1: Complex.ONE, eigenvalue2: -Complex.ONE);
+final mh = MeasurableOperator(operator: H, eigenvalue1: Complex.ONE, eigenvalue2: -Complex.ONE);
+final mrx = (double theta) => MeasurableOperator(
+  operator: rx(theta), 
+  eigenvalue1: Complex.polar(1, theta / 2), 
+  eigenvalue2: Complex.polar(1, -theta / 2)
+);
+final mry = (double theta) => MeasurableOperator(
+  operator: ry(theta), 
+  eigenvalue1: Complex.polar(1, theta / 2), 
+  eigenvalue2: Complex.polar(1, -theta / 2)
+);
+final mrz = (double theta) => MeasurableOperator(
+  operator: rz(theta), 
+  eigenvalue1: Complex.polar(1, theta / 2), 
+  eigenvalue2: Complex.polar(1, -theta / 2)
+);
 
 typedef Operator = ComplexTuple Function(ComplexTuple);
 
@@ -322,6 +368,25 @@ final Operator Y = (input) => ComplexTuple(zero: -Complex.I * input.one, one: Co
 final Operator Z = (input) => ComplexTuple(zero: input.zero, one: -input.one);
 final Operator H = (input) => ComplexTuple(zero: (input.zero + input.one) / sqrt(2.0), one: (input.zero - input.one) / sqrt(2.0));
 final Operator I = (input) => ComplexTuple(zero: input.zero, one: input.one);
+final Operator Function(double) ri = (theta) {
+  return (input) {
+    return ComplexTuple(
+      zero: input.zero * Complex.polar(1, theta), 
+      one: input.one * Complex.polar(1, theta),
+    );
+  };
+};
+
+final Operator Function(Complex) ci = (complex) {
+  assert((complex.abs() - 1) < 1e-6);
+  return (input) {
+    return ComplexTuple(
+      zero: input.zero * complex, 
+      one: input.one * complex,
+    );
+  };
+
+};
 
 final Operator Function(double) rx = (theta) {
   return (input) {

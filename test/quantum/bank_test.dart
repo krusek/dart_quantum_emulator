@@ -157,15 +157,44 @@ void main() {
         expect([Complex.ONE,], bank);
       }
     });
+  });
 
-    test('playground', () {
-      final bank = Bank.create(debug: true);
-      final qubits = bank.borrowQubits(length: 3);
-      bank.operate(target: qubits[0], operator: X);
-      bank.operate(target: qubits[1], operator: X);
-      bank.operate(target: qubits[2], operator: H);
-      bank.operate(target: qubits[0], operator: H);
-      bank.operate(target: qubits[1], operator: X);
+  group('rotation measurements', () {
+
+    void assertOperation({MeasurableOperator measurable}) {
+      final bank = Bank(debug: false, generator: Generator(elements: [0.0]).nextDouble);
+      final qubits = bank.borrowQubits(length: 1);
+      final m = bank.measurement(targets: qubits, operators: [measurable]);
+      bank.operate(target: qubits[0], operator: measurable.operator);
+      bank.operate(target: qubits[0], operator: ci(measurable.eigenvalue1));
+
+      final bank2 = Bank(debug: false, generator: Generator(elements: [0.0]).nextDouble);
+      final qubits2 = bank2.borrowQubits(length: 1);
+      final m2 = bank2.measurement(targets: qubits2, operators: [measurable]);
+
+      expect(m, m2);
+      expect(bank, bank2);
+    }
+
+    test('Rx(theta) measurement', () {
+      final theta = 3.1415926535/2;
+      final measurable = mrx(theta);
+
+      assertOperation(measurable: measurable);
+    });
+    test('Ry(theta) measurement', () {
+
+      final theta = 3.1415926535/2;
+      final measurable = mry(theta);
+
+      assertOperation(measurable: measurable);
+    });
+    test('Rz(theta) measurement', () {
+
+      final theta = 3.1415926535/2;
+      final measurable = mrz(theta);
+
+      assertOperation(measurable: measurable);
     });
   });
 
@@ -189,11 +218,11 @@ void main() {
       expect({3:1.0}, bank);
       expect(m, Measurement.One);
       
-      m = bank.measurement(targets: qubits, paulis: [PauliZ, PauliZ]);
+      m = bank.measurement(targets: qubits, operators: [mz, mz]);
       expect({3:1.0}, bank);
       expect(m, Measurement.Zero);
 
-      m = bank.measurement(targets: qubits, paulis: [PauliZ, PauliX]);
+      m = bank.measurement(targets: qubits, operators: [mz, mx]);
       expect({1: sqrt1_2, 3: sqrt1_2}, bank);
       expect(m, Measurement.One);
     });

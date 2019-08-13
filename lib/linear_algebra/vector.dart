@@ -50,9 +50,16 @@ class Vector {
     return Vector(result);
   }
 
-  operator *(double d) {
+  operator *(Object d) {
     final result = this.elements.map((t) {
       return t*d;
+    }).toList();
+    return Vector(result);
+  }
+
+  operator /(Object d) {
+    final result = this.elements.map((t) {
+      return t/d;
     }).toList();
     return Vector(result);
   }
