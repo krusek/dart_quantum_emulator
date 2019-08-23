@@ -31,13 +31,13 @@
             <td class="headerValue">lcov.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">110</td>
-            <td class="headerCovTableEntry">128</td>
-            <td class="headerCovTableEntryMed">85.9 %</td>
+            <td class="headerCovTableEntry">170</td>
+            <td class="headerCovTableEntry">194</td>
+            <td class="headerCovTableEntryMed">87.6 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2019-07-29 07:13:29</td>
+            <td class="headerValue">2019-08-12 07:22:13</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -95,306 +95,391 @@
 <a name="33"><span class="lineNum">      33 </span>            : }</a>
 <a name="34"><span class="lineNum">      34 </span>            : </a>
 <a name="35"><span class="lineNum">      35 </span>            : class Bank {</a>
-<a name="36"><span class="lineNum">      36 </span>            :   final double Function() _generator;</a>
-<a name="37"><span class="lineNum">      37 </span>            :   List&lt;Qubit&gt; _qubits = List&lt;Qubit&gt;.filled(0, Qubit(index: 0), growable: true);</a>
-<a name="38"><span class="lineNum">      38 </span><span class="lineCov">          6 :   List&lt;Complex&gt; _data = List&lt;Complex&gt;.generate(1, (i) =&gt; i == 0 ? Complex.ONE : Complex.ZERO);</span></a>
-<a name="39"><span class="lineNum">      39 </span>            : </a>
-<a name="40"><span class="lineNum">      40 </span><span class="lineCov">          3 :   static Bank create([int seed]) {</span></a>
-<a name="41"><span class="lineNum">      41 </span><span class="lineCov">          3 :     final Random random = Random(seed);</span></a>
-<a name="42"><span class="lineNum">      42 </span><span class="lineCov">          6 :     return Bank(generator: random.nextDouble);</span></a>
-<a name="43"><span class="lineNum">      43 </span>            :   }</a>
-<a name="44"><span class="lineNum">      44 </span>            : </a>
-<a name="45"><span class="lineNum">      45 </span><span class="lineCov">          3 :   Bank({double Function() generator}) : _generator = generator;</span></a>
-<a name="46"><span class="lineNum">      46 </span>            : </a>
-<a name="47"><span class="lineNum">      47 </span>            :   /// Returns a list of unused qubits of the given [length].</a>
-<a name="48"><span class="lineNum">      48 </span><span class="lineCov">          3 :   List&lt;Qubit&gt; borrowQubits({int length}) {</span></a>
-<a name="49"><span class="lineNum">      49 </span><span class="lineCov">          3 :     assert(length &gt; 0);</span></a>
-<a name="50"><span class="lineNum">      50 </span><span class="lineCov">          6 :     final l = _qubits.length;</span></a>
-<a name="51"><span class="lineNum">      51 </span>            :     </a>
-<a name="52"><span class="lineNum">      52 </span><span class="lineCov">          6 :     final int newLength = pow(2, l + length);</span></a>
-<a name="53"><span class="lineNum">      53 </span><span class="lineCov">          6 :     final oldLength = _data.length;</span></a>
-<a name="54"><span class="lineNum">      54 </span><span class="lineCov">          6 :     _data.length = newLength;</span></a>
-<a name="55"><span class="lineNum">      55 </span><span class="lineCov">          6 :     for (final int i in range(oldLength, newLength)) {</span></a>
-<a name="56"><span class="lineNum">      56 </span><span class="lineCov">          6 :       _data[i] = Complex.ZERO;</span></a>
-<a name="57"><span class="lineNum">      57 </span>            :     }</a>
-<a name="58"><span class="lineNum">      58 </span><span class="lineCov">          9 :     _qubits.length += length;</span></a>
-<a name="59"><span class="lineNum">      59 </span><span class="lineCov">          9 :     for (final int i in range(l, l + length)) {</span></a>
-<a name="60"><span class="lineNum">      60 </span><span class="lineCov">          9 :       _qubits[i] = Qubit(index: i);</span></a>
+<a name="36"><span class="lineNum">      36 </span>            :   final bool _debugForLearning;</a>
+<a name="37"><span class="lineNum">      37 </span>            :   final double Function() _generator;</a>
+<a name="38"><span class="lineNum">      38 </span>            :   List&lt;Qubit&gt; _qubits = List&lt;Qubit&gt;.filled(0, Qubit(index: 0), growable: true);</a>
+<a name="39"><span class="lineNum">      39 </span><span class="lineCov">          6 :   List&lt;Complex&gt; _data = List&lt;Complex&gt;.generate(1, (i) =&gt; i == 0 ? Complex.ONE : Complex.ZERO);</span></a>
+<a name="40"><span class="lineNum">      40 </span>            : </a>
+<a name="41"><span class="lineNum">      41 </span><span class="lineCov">          3 :   static Bank create({int seed, bool debug = false}) {</span></a>
+<a name="42"><span class="lineNum">      42 </span><span class="lineCov">          3 :     final Random random = Random(seed);</span></a>
+<a name="43"><span class="lineNum">      43 </span><span class="lineCov">          6 :     return Bank(generator: random.nextDouble, debug: debug);</span></a>
+<a name="44"><span class="lineNum">      44 </span>            :   }</a>
+<a name="45"><span class="lineNum">      45 </span>            : </a>
+<a name="46"><span class="lineNum">      46 </span><span class="lineCov">          3 :   Bank({double Function() generator, bool debug = false}) : </span></a>
+<a name="47"><span class="lineNum">      47 </span>            :     _generator = generator,</a>
+<a name="48"><span class="lineNum">      48 </span>            :     _debugForLearning = debug;</a>
+<a name="49"><span class="lineNum">      49 </span>            : </a>
+<a name="50"><span class="lineNum">      50 </span>            :   /// Returns a list of unused qubits of the given [length].</a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">          3 :   List&lt;Qubit&gt; borrowQubits({int length}) {</span></a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">          6 :     print(&quot;acquiring $length qubits.&quot;);</span></a>
+<a name="53"><span class="lineNum">      53 </span><span class="lineCov">          3 :     assert(length &gt; 0);</span></a>
+<a name="54"><span class="lineNum">      54 </span><span class="lineCov">          6 :     final l = _qubits.length;</span></a>
+<a name="55"><span class="lineNum">      55 </span>            :     </a>
+<a name="56"><span class="lineNum">      56 </span><span class="lineCov">          6 :     final int newLength = pow(2, l + length);</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">          6 :     final oldLength = _data.length;</span></a>
+<a name="58"><span class="lineNum">      58 </span><span class="lineCov">          6 :     _data.length = newLength;</span></a>
+<a name="59"><span class="lineNum">      59 </span><span class="lineCov">          6 :     for (final int i in range(oldLength, newLength)) {</span></a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineCov">          6 :       _data[i] = Complex.ZERO;</span></a>
 <a name="61"><span class="lineNum">      61 </span>            :     }</a>
-<a name="62"><span class="lineNum">      62 </span><span class="lineCov">          6 :     return _qubits.sublist(l);</span></a>
-<a name="63"><span class="lineNum">      63 </span>            :   }</a>
-<a name="64"><span class="lineNum">      64 </span>            : </a>
-<a name="65"><span class="lineNum">      65 </span><span class="lineCov">          1 :   String toString() {</span></a>
-<a name="66"><span class="lineNum">      66 </span><span class="lineCov">          5 :     final monomials = range(0, _data.length).map((i) {</span></a>
-<a name="67"><span class="lineNum">      67 </span><span class="lineCov">          2 :       final d = _data[i];</span></a>
-<a name="68"><span class="lineNum">      68 </span><span class="lineCov">          1 :       if (d != Complex.ZERO) {</span></a>
-<a name="69"><span class="lineNum">      69 </span><span class="lineCov">          7 :         final binary = i.toRadixString(2).padLeft(_qubits.length, &quot;0&quot;).split('').reversed.join();</span></a>
-<a name="70"><span class="lineNum">      70 </span><span class="lineCov">          4 :         return &quot;${d.abs() * d.abs()} |$binary&gt;&quot;;</span></a>
-<a name="71"><span class="lineNum">      71 </span>            :       }</a>
-<a name="72"><span class="lineNum">      72 </span>            :       return null;</a>
-<a name="73"><span class="lineNum">      73 </span><span class="lineCov">          2 :     }).where((x) =&gt; x != null);</span></a>
-<a name="74"><span class="lineNum">      74 </span><span class="lineCov">          1 :     return monomials.join(&quot; + &quot;);</span></a>
-<a name="75"><span class="lineNum">      75 </span>            :   }</a>
-<a name="76"><span class="lineNum">      76 </span>            : </a>
-<a name="77"><span class="lineNum">      77 </span><span class="lineNoCov">          0 :   void release({List&lt;Qubit&gt; qubits}) {} // Not necessarily needed, but can be implemented for memory reasons.</span></a>
-<a name="78"><span class="lineNum">      78 </span>            : </a>
-<a name="79"><span class="lineNum">      79 </span>            :   /// Performs the given [operator] on the [target] qubit.</a>
-<a name="80"><span class="lineNum">      80 </span>            :   /// </a>
-<a name="81"><span class="lineNum">      81 </span>            :   /// If [controls] are specified then those qubits will be used as controls.</a>
-<a name="82"><span class="lineNum">      82 </span>            :   /// The [target] qubit cannot be contained in the [controls] list. When the </a>
-<a name="83"><span class="lineNum">      83 </span>            :   /// additional array [controlModifiers] is not supplied then the operation</a>
-<a name="84"><span class="lineNum">      84 </span>            :   /// will be controlled on [controls] being |1&gt;. Otherwise [controlModifiers]</a>
-<a name="85"><span class="lineNum">      85 </span>            :   /// can be used to decide whether the respective [controls] qubits are |1&gt;</a>
-<a name="86"><span class="lineNum">      86 </span>            :   /// where [controlModifiers] is true and |0&gt; where [controlModifiers] is</a>
-<a name="87"><span class="lineNum">      87 </span>            :   /// false.</a>
-<a name="88"><span class="lineNum">      88 </span><span class="lineCov">          3 :   void operate({@required Qubit target, @required Operator operator, List&lt;Qubit&gt; controls = const [], List&lt;bool&gt; controlModifiers,}) {</span></a>
-<a name="89"><span class="lineNum">      89 </span><span class="lineCov">          6 :     _operate(target: target, operator: operator, controls: controls, controlModifiers: controlModifiers, data: _data);</span></a>
-<a name="90"><span class="lineNum">      90 </span>            :   }</a>
-<a name="91"><span class="lineNum">      91 </span>            : </a>
-<a name="92"><span class="lineNum">      92 </span><span class="lineCov">          3 :   void _operate({@required Qubit target, @required Operator operator, @required List&lt;Complex&gt; data, List&lt;Qubit&gt; controls = const [], List&lt;bool&gt; controlModifiers,}) {</span></a>
-<a name="93"><span class="lineNum">      93 </span>            :     if (controlModifiers == null) {</a>
-<a name="94"><span class="lineNum">      94 </span><span class="lineCov">          9 :       controlModifiers = controls.map((_) =&gt; true).toList();</span></a>
-<a name="95"><span class="lineNum">      95 </span>            :     }</a>
-<a name="96"><span class="lineNum">      96 </span><span class="lineCov">          9 :     assert(controls.length == controlModifiers.length);</span></a>
-<a name="97"><span class="lineNum">      97 </span><span class="lineCov">          6 :     final length = _qubits.length;</span></a>
-<a name="98"><span class="lineNum">      98 </span><span class="lineCov">          3 :     final oneControls = zip(controls, controlModifiers)</span></a>
-<a name="99"><span class="lineNum">      99 </span><span class="lineCov">          9 :       .where((tuple) =&gt; tuple.one)</span></a>
-<a name="100"><span class="lineNum">     100 </span><span class="lineCov">         15 :       .map((tuple) =&gt; tuple.zero.index(length)).toList();</span></a>
-<a name="101"><span class="lineNum">     101 </span><span class="lineCov">          3 :     final zeroControls = zip(controls, controlModifiers)</span></a>
-<a name="102"><span class="lineNum">     102 </span><span class="lineCov">          9 :       .where((tuple) =&gt; !tuple.one)</span></a>
-<a name="103"><span class="lineNum">     103 </span><span class="lineCov">          6 :       .map((tuple) =&gt; tuple.zero.index(length)).toList();</span></a>
-<a name="104"><span class="lineNum">     104 </span><span class="lineCov">          9 :     for (final tuple in indexes(target: target.index(length), length: length, controls: oneControls, anticontrols: zeroControls)) {</span></a>
-<a name="105"><span class="lineNum">     105 </span><span class="lineCov">         15 :       final input = ComplexTuple(zero: data[tuple.zero], one:data[tuple.one]);</span></a>
-<a name="106"><span class="lineNum">     106 </span><span class="lineCov">          3 :       final newData = operator(input);</span></a>
-<a name="107"><span class="lineNum">     107 </span><span class="lineCov">          9 :       data[tuple.zero] = newData.zero;</span></a>
-<a name="108"><span class="lineNum">     108 </span><span class="lineCov">          9 :       data[tuple.one] = newData.one;</span></a>
-<a name="109"><span class="lineNum">     109 </span>            :     }</a>
-<a name="110"><span class="lineNum">     110 </span>            :   }</a>
-<a name="111"><span class="lineNum">     111 </span>            : </a>
-<a name="112"><span class="lineNum">     112 </span>            :   /// Measures the [target] qubit with respect to the Z operator.</a>
-<a name="113"><span class="lineNum">     113 </span><span class="lineCov">          1 :   Measurement measure({@required Qubit target}) {</span></a>
-<a name="114"><span class="lineNum">     114 </span><span class="lineCov">          4 :     return measurement(targets: [target], operators: [Z]);</span></a>
-<a name="115"><span class="lineNum">     115 </span>            :   }</a>
-<a name="116"><span class="lineNum">     116 </span>            : </a>
-<a name="117"><span class="lineNum">     117 </span>            :   /// Measures the qubit array, [targets] with respect to the</a>
-<a name="118"><span class="lineNum">     118 </span>            :   /// input [operators].</a>
-<a name="119"><span class="lineNum">     119 </span>            :   /// The two arrays must be the same length.</a>
-<a name="120"><span class="lineNum">     120 </span>            :   /// </a>
-<a name="121"><span class="lineNum">     121 </span>            :   /// *NOTE*: This assumes that the tensor product of the operators has </a>
-<a name="122"><span class="lineNum">     122 </span>            :   /// eigenvalues 1 and -1. As some point may replace [operators] with</a>
-<a name="123"><span class="lineNum">     123 </span>            :   /// an enumeration to limit it to H, X, Y, and Z.</a>
-<a name="124"><span class="lineNum">     124 </span><span class="lineCov">          1 :   Measurement measurement({@required List&lt;Qubit&gt; targets, @required List&lt;Operator&gt; operators}) {</span></a>
-<a name="125"><span class="lineNum">     125 </span><span class="lineCov">          3 :     assert(targets.length == operators.length);</span></a>
-<a name="126"><span class="lineNum">     126 </span>            : </a>
-<a name="127"><span class="lineNum">     127 </span><span class="lineCov">          2 :     final List&lt;Complex&gt; copy = List&lt;Complex&gt;.from(_data);</span></a>
-<a name="128"><span class="lineNum">     128 </span><span class="lineCov">          2 :     for (final pair in zip(targets, operators)) {</span></a>
-<a name="129"><span class="lineNum">     129 </span><span class="lineCov">          3 :       _operate(target: pair.zero, operator: pair.one, data: copy);</span></a>
-<a name="130"><span class="lineNum">     130 </span>            :     }</a>
-<a name="131"><span class="lineNum">     131 </span><span class="lineCov">          1 :     final Vector evaluated = Vector(copy);</span></a>
-<a name="132"><span class="lineNum">     132 </span><span class="lineCov">          2 :     final Vector original = Vector(_data);</span></a>
-<a name="133"><span class="lineNum">     133 </span>            : </a>
-<a name="134"><span class="lineNum">     134 </span><span class="lineCov">          2 :     final zeroVector = (original + evaluated) * 0.5;</span></a>
-<a name="135"><span class="lineNum">     135 </span><span class="lineCov">          2 :     final oneVector = (original - evaluated) * 0.5;</span></a>
+<a name="62"><span class="lineNum">      62 </span><span class="lineCov">          9 :     _qubits.length += length;</span></a>
+<a name="63"><span class="lineNum">      63 </span><span class="lineCov">          9 :     for (final int i in range(l, l + length)) {</span></a>
+<a name="64"><span class="lineNum">      64 </span><span class="lineCov">          9 :       _qubits[i] = Qubit(index: i);</span></a>
+<a name="65"><span class="lineNum">      65 </span>            :     }</a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineCov">          6 :     return _qubits.sublist(l);</span></a>
+<a name="67"><span class="lineNum">      67 </span>            :   }</a>
+<a name="68"><span class="lineNum">      68 </span>            : </a>
+<a name="69"><span class="lineNum">      69 </span><span class="lineCov">          1 :   String toString() {</span></a>
+<a name="70"><span class="lineNum">      70 </span><span class="lineCov">          5 :     final monomials = range(0, _data.length).map((i) {</span></a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineCov">          2 :       final d = _data[i];</span></a>
+<a name="72"><span class="lineNum">      72 </span><span class="lineCov">          1 :       if (d != Complex.ZERO) {</span></a>
+<a name="73"><span class="lineNum">      73 </span><span class="lineCov">          7 :         final binary = i.toRadixString(2).padLeft(_qubits.length, &quot;0&quot;).split('').reversed.join();</span></a>
+<a name="74"><span class="lineNum">      74 </span><span class="lineCov">          1 :         if (this._debugForLearning) </span></a>
+<a name="75"><span class="lineNum">      75 </span><span class="lineNoCov">          0 :           return &quot;${d.abs() * d.abs()} |$binary&gt;&quot;;</span></a>
+<a name="76"><span class="lineNum">      76 </span>            :         else</a>
+<a name="77"><span class="lineNum">      77 </span><span class="lineCov">          1 :           return &quot;${d} |$binary&gt;&quot;;</span></a>
+<a name="78"><span class="lineNum">      78 </span>            :       }</a>
+<a name="79"><span class="lineNum">      79 </span>            :       return null;</a>
+<a name="80"><span class="lineNum">      80 </span><span class="lineCov">          2 :     }).where((x) =&gt; x != null);</span></a>
+<a name="81"><span class="lineNum">      81 </span><span class="lineCov">          1 :     return monomials.join(&quot; + &quot;);</span></a>
+<a name="82"><span class="lineNum">      82 </span>            :   }</a>
+<a name="83"><span class="lineNum">      83 </span>            : </a>
+<a name="84"><span class="lineNum">      84 </span><span class="lineNoCov">          0 :   void release({List&lt;Qubit&gt; qubits}) {} // Not necessarily needed, but can be implemented for memory reasons.</span></a>
+<a name="85"><span class="lineNum">      85 </span>            : </a>
+<a name="86"><span class="lineNum">      86 </span>            :   /// Performs the given [operator] on the [target] qubit.</a>
+<a name="87"><span class="lineNum">      87 </span>            :   /// </a>
+<a name="88"><span class="lineNum">      88 </span>            :   /// If [controls] are specified then those qubits will be used as controls.</a>
+<a name="89"><span class="lineNum">      89 </span>            :   /// The [target] qubit cannot be contained in the [controls] list. When the </a>
+<a name="90"><span class="lineNum">      90 </span>            :   /// additional array [controlModifiers] is not supplied then the operation</a>
+<a name="91"><span class="lineNum">      91 </span>            :   /// will be controlled on [controls] being |1&gt;. Otherwise [controlModifiers]</a>
+<a name="92"><span class="lineNum">      92 </span>            :   /// can be used to decide whether the respective [controls] qubits are |1&gt;</a>
+<a name="93"><span class="lineNum">      93 </span>            :   /// where [controlModifiers] is true and |0&gt; where [controlModifiers] is</a>
+<a name="94"><span class="lineNum">      94 </span>            :   /// false.</a>
+<a name="95"><span class="lineNum">      95 </span><span class="lineCov">          3 :   void operate({@required Qubit target, @required Operator operator, List&lt;Qubit&gt; controls = const [], List&lt;bool&gt; controlModifiers,}) {</span></a>
+<a name="96"><span class="lineNum">      96 </span><span class="lineCov">          6 :     _operate(target: target, operator: operator, controls: controls, controlModifiers: controlModifiers, data: _data);</span></a>
+<a name="97"><span class="lineNum">      97 </span><span class="lineCov">          3 :     if (_debugForLearning) {</span></a>
+<a name="98"><span class="lineNum">      98 </span><span class="lineNoCov">          0 :       final vector = Vector(this._data);</span></a>
+<a name="99"><span class="lineNum">      99 </span><span class="lineNoCov">          0 :       final normalized = vector.normalized();</span></a>
+<a name="100"><span class="lineNum">     100 </span><span class="lineNoCov">          0 :       this._data = normalized.elements;</span></a>
+<a name="101"><span class="lineNum">     101 </span><span class="lineNoCov">          0 :       print(&quot;$this&quot;);</span></a>
+<a name="102"><span class="lineNum">     102 </span>            :     }</a>
+<a name="103"><span class="lineNum">     103 </span>            :   }</a>
+<a name="104"><span class="lineNum">     104 </span>            : </a>
+<a name="105"><span class="lineNum">     105 </span><span class="lineCov">          3 :   void _operate({@required Qubit target, @required Operator operator, @required List&lt;Complex&gt; data, List&lt;Qubit&gt; controls = const [], List&lt;bool&gt; controlModifiers,}) {</span></a>
+<a name="106"><span class="lineNum">     106 </span>            :     if (controlModifiers == null) {</a>
+<a name="107"><span class="lineNum">     107 </span><span class="lineCov">          9 :       controlModifiers = controls.map((_) =&gt; true).toList();</span></a>
+<a name="108"><span class="lineNum">     108 </span>            :     }</a>
+<a name="109"><span class="lineNum">     109 </span><span class="lineCov">          9 :     assert(controls.length == controlModifiers.length);</span></a>
+<a name="110"><span class="lineNum">     110 </span><span class="lineCov">          6 :     final length = _qubits.length;</span></a>
+<a name="111"><span class="lineNum">     111 </span><span class="lineCov">          3 :     final oneControls = zip(controls, controlModifiers)</span></a>
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">          9 :       .where((tuple) =&gt; tuple.one)</span></a>
+<a name="113"><span class="lineNum">     113 </span><span class="lineCov">         15 :       .map((tuple) =&gt; tuple.zero.index(length)).toList();</span></a>
+<a name="114"><span class="lineNum">     114 </span><span class="lineCov">          3 :     final zeroControls = zip(controls, controlModifiers)</span></a>
+<a name="115"><span class="lineNum">     115 </span><span class="lineCov">          9 :       .where((tuple) =&gt; !tuple.one)</span></a>
+<a name="116"><span class="lineNum">     116 </span><span class="lineCov">          6 :       .map((tuple) =&gt; tuple.zero.index(length)).toList();</span></a>
+<a name="117"><span class="lineNum">     117 </span><span class="lineCov">          9 :     for (final tuple in indexes(target: target.index(length), length: length, controls: oneControls, anticontrols: zeroControls)) {</span></a>
+<a name="118"><span class="lineNum">     118 </span><span class="lineCov">         15 :       final input = ComplexTuple(zero: data[tuple.zero], one:data[tuple.one]);</span></a>
+<a name="119"><span class="lineNum">     119 </span><span class="lineCov">          3 :       final newData = operator(input);</span></a>
+<a name="120"><span class="lineNum">     120 </span><span class="lineCov">          9 :       data[tuple.zero] = newData.zero;</span></a>
+<a name="121"><span class="lineNum">     121 </span><span class="lineCov">          9 :       data[tuple.one] = newData.one;</span></a>
+<a name="122"><span class="lineNum">     122 </span>            :     }</a>
+<a name="123"><span class="lineNum">     123 </span>            :   }</a>
+<a name="124"><span class="lineNum">     124 </span>            : </a>
+<a name="125"><span class="lineNum">     125 </span>            :   /// Measures the [target] qubit with respect to the Z Pauli operator.</a>
+<a name="126"><span class="lineNum">     126 </span><span class="lineCov">          1 :   Measurement measure({@required Qubit target}) {</span></a>
+<a name="127"><span class="lineNum">     127 </span><span class="lineCov">          4 :     return measurement(targets: [target], operators: [mz]);</span></a>
+<a name="128"><span class="lineNum">     128 </span>            :   }</a>
+<a name="129"><span class="lineNum">     129 </span>            : </a>
+<a name="130"><span class="lineNum">     130 </span>            :   /// Measures the qubit array, [targets] with respect to the</a>
+<a name="131"><span class="lineNum">     131 </span>            :   /// input [paulis].</a>
+<a name="132"><span class="lineNum">     132 </span>            :   /// The two arrays must be the same length.</a>
+<a name="133"><span class="lineNum">     133 </span><span class="lineCov">          1 :   Measurement measurement({@required List&lt;Qubit&gt; targets, @required List&lt;MeasurableOperator&gt; operators}) {</span></a>
+<a name="134"><span class="lineNum">     134 </span><span class="lineCov">          3 :     assert(targets.length == operators.length);</span></a>
+<a name="135"><span class="lineNum">     135 </span><span class="lineCov">          2 :     assert(targets.length &gt; 0);</span></a>
 <a name="136"><span class="lineNum">     136 </span>            : </a>
-<a name="137"><span class="lineNum">     137 </span><span class="lineCov">          1 :     final zeroProbability = zeroVector.normSquared();</span></a>
-<a name="138"><span class="lineNum">     138 </span>            : </a>
-<a name="139"><span class="lineNum">     139 </span><span class="lineCov">          1 :     final r = _generator();</span></a>
-<a name="140"><span class="lineNum">     140 </span><span class="lineCov">          1 :     if (r &lt; zeroProbability) {</span></a>
-<a name="141"><span class="lineNum">     141 </span><span class="lineCov">          3 :       _data = zeroVector.normalized().elements;</span></a>
-<a name="142"><span class="lineNum">     142 </span>            :       return Measurement.Zero;</a>
-<a name="143"><span class="lineNum">     143 </span>            :     } else {</a>
-<a name="144"><span class="lineNum">     144 </span><span class="lineCov">          1 :       oneVector.normalized();</span></a>
-<a name="145"><span class="lineNum">     145 </span><span class="lineCov">          3 :       _data = oneVector.normalized().elements;</span></a>
-<a name="146"><span class="lineNum">     146 </span>            :       return Measurement.One;</a>
-<a name="147"><span class="lineNum">     147 </span>            :     }</a>
-<a name="148"><span class="lineNum">     148 </span>            :   }</a>
+<a name="137"><span class="lineNum">     137 </span><span class="lineCov">          2 :     final List&lt;Complex&gt; copy = List&lt;Complex&gt;.from(_data);</span></a>
+<a name="138"><span class="lineNum">     138 </span><span class="lineCov">          2 :     for (final pair in zip(targets, operators)) {</span></a>
+<a name="139"><span class="lineNum">     139 </span><span class="lineCov">          4 :       _operate(target: pair.zero, operator: pair.one.operator, data: copy);</span></a>
+<a name="140"><span class="lineNum">     140 </span>            :     }</a>
+<a name="141"><span class="lineNum">     141 </span><span class="lineCov">          1 :     final Vector evaluated = Vector(copy);</span></a>
+<a name="142"><span class="lineNum">     142 </span><span class="lineCov">          2 :     final Vector original = Vector(_data);</span></a>
+<a name="143"><span class="lineNum">     143 </span>            : </a>
+<a name="144"><span class="lineNum">     144 </span><span class="lineCov">          1 :     final zeroEigenvalue = _zeroEigenvalue(operators);</span></a>
+<a name="145"><span class="lineNum">     145 </span><span class="lineCov">          1 :     final oneEigenvalue = _oneEigenvalue(operators);</span></a>
+<a name="146"><span class="lineNum">     146 </span>            : </a>
+<a name="147"><span class="lineNum">     147 </span><span class="lineCov">          4 :     final zeroVector = (original - evaluated * oneEigenvalue) / (zeroEigenvalue - oneEigenvalue);</span></a>
+<a name="148"><span class="lineNum">     148 </span><span class="lineCov">          4 :     final oneVector = (original - evaluated * zeroEigenvalue) / (zeroEigenvalue - oneEigenvalue);</span></a>
 <a name="149"><span class="lineNum">     149 </span>            : </a>
-<a name="150"><span class="lineNum">     150 </span><span class="lineCov">          3 :   @visibleForTesting</span></a>
-<a name="151"><span class="lineNum">     151 </span>            :   bool operator ==(Object other) {</a>
-<a name="152"><span class="lineNum">     152 </span>            :     if (identical(this, other)) {</a>
-<a name="153"><span class="lineNum">     153 </span>            :       return true;</a>
-<a name="154"><span class="lineNum">     154 </span>            :     }</a>
-<a name="155"><span class="lineNum">     155 </span><span class="lineCov">          3 :     if (other is List&lt;Complex&gt;) { </span></a>
-<a name="156"><span class="lineNum">     156 </span>            :       final List&lt;Complex&gt; data = other;</a>
-<a name="157"><span class="lineNum">     157 </span><span class="lineCov">         12 :       final norm = zip(data, this._data).map((tuple) {</span></a>
-<a name="158"><span class="lineNum">     158 </span><span class="lineCov">         12 :         return (tuple.zero - tuple.one).abs();</span></a>
-<a name="159"><span class="lineNum">     159 </span><span class="lineCov">          9 :       }).reduce((a, b) =&gt; a + b);</span></a>
-<a name="160"><span class="lineNum">     160 </span><span class="lineCov">          3 :       return norm &lt; 1e-6;</span></a>
-<a name="161"><span class="lineNum">     161 </span><span class="lineCov">          2 :     } else if (other is List&lt;double&gt;) { </span></a>
-<a name="162"><span class="lineNum">     162 </span>            :       final List&lt;double&gt; data = other;</a>
-<a name="163"><span class="lineNum">     163 </span><span class="lineCov">          4 :       final norm = zip(data, this._data).map((tuple) {</span></a>
-<a name="164"><span class="lineNum">     164 </span><span class="lineCov">          5 :         return (Complex(tuple.zero) - tuple.one).abs();</span></a>
-<a name="165"><span class="lineNum">     165 </span><span class="lineCov">          3 :       }).reduce((a, b) =&gt; a + b);</span></a>
-<a name="166"><span class="lineNum">     166 </span><span class="lineCov">          1 :       return norm &lt; 1e-6;</span></a>
-<a name="167"><span class="lineNum">     167 </span><span class="lineCov">          2 :     } else if (other is Map&lt;String, Complex&gt;) {</span></a>
-<a name="168"><span class="lineNum">     168 </span><span class="lineNoCov">          0 :       var comp = Map&lt;int, Complex&gt;();</span></a>
-<a name="169"><span class="lineNum">     169 </span><span class="lineNoCov">          0 :       for (final key in other.keys) {</span></a>
-<a name="170"><span class="lineNum">     170 </span><span class="lineNoCov">          0 :         final value = int.tryParse(key, radix: 2);</span></a>
-<a name="171"><span class="lineNum">     171 </span>            :         if (value == null) return false;</a>
-<a name="172"><span class="lineNum">     172 </span><span class="lineNoCov">          0 :         comp[value] = other[key];</span></a>
-<a name="173"><span class="lineNum">     173 </span>            :       }</a>
-<a name="174"><span class="lineNum">     174 </span><span class="lineNoCov">          0 :       return _mapEquality(comp);</span></a>
-<a name="175"><span class="lineNum">     175 </span><span class="lineCov">          2 :     } else if (other is Map&lt;int, Complex&gt;) {</span></a>
-<a name="176"><span class="lineNum">     176 </span><span class="lineCov">          2 :       return _mapEquality(other);</span></a>
-<a name="177"><span class="lineNum">     177 </span><span class="lineCov">          1 :     } else if (other is Map&lt;int, double&gt;) {</span></a>
-<a name="178"><span class="lineNum">     178 </span><span class="lineCov">          2 :       var comp = other.map((ix, db) {</span></a>
-<a name="179"><span class="lineNum">     179 </span><span class="lineCov">          2 :         return MapEntry&lt;int, Complex&gt;(ix, Complex(db));</span></a>
-<a name="180"><span class="lineNum">     180 </span>            :       });</a>
-<a name="181"><span class="lineNum">     181 </span><span class="lineCov">          1 :       return _mapEquality(comp);</span></a>
-<a name="182"><span class="lineNum">     182 </span>            :     } else {</a>
-<a name="183"><span class="lineNum">     183 </span>            :       return false;</a>
-<a name="184"><span class="lineNum">     184 </span>            :     }</a>
-<a name="185"><span class="lineNum">     185 </span>            :   }</a>
-<a name="186"><span class="lineNum">     186 </span>            : </a>
-<a name="187"><span class="lineNum">     187 </span><span class="lineCov">          2 :   bool _mapEquality(Map&lt;int, Complex&gt; other) {</span></a>
-<a name="188"><span class="lineNum">     188 </span><span class="lineCov">          6 :     final norm = other.keys.map((key) {</span></a>
-<a name="189"><span class="lineNum">     189 </span><span class="lineCov">         10 :       return (other[key] - this._data[key]).abs();</span></a>
-<a name="190"><span class="lineNum">     190 </span><span class="lineCov">          4 :     }).reduce((a,b) =&gt; a+b);</span></a>
-<a name="191"><span class="lineNum">     191 </span><span class="lineCov">          2 :     return norm &lt; 1e-6;</span></a>
-<a name="192"><span class="lineNum">     192 </span>            :   }</a>
-<a name="193"><span class="lineNum">     193 </span>            : </a>
-<a name="194"><span class="lineNum">     194 </span><span class="lineNoCov">          0 :   @visibleForTesting</span></a>
-<a name="195"><span class="lineNum">     195 </span>            :   int get hashCode {</a>
-<a name="196"><span class="lineNum">     196 </span><span class="lineNoCov">          0 :     if (this._data.length == 0) { return 0; }</span></a>
-<a name="197"><span class="lineNum">     197 </span><span class="lineNoCov">          0 :     return this._data.map((f) =&gt; f.hashCode).reduce((i,j) =&gt; i+j);</span></a>
-<a name="198"><span class="lineNum">     198 </span>            :   }</a>
-<a name="199"><span class="lineNum">     199 </span>            : }</a>
-<a name="200"><span class="lineNum">     200 </span>            : </a>
-<a name="201"><span class="lineNum">     201 </span>            : /// Creates an iterator over boolean integers.</a>
-<a name="202"><span class="lineNum">     202 </span>            : /// </a>
-<a name="203"><span class="lineNum">     203 </span>            : /// This method returns all integers of boolean [length]</a>
-<a name="204"><span class="lineNum">     204 </span>            : /// paired up with the [target] index being |0&gt; or |1&gt;.</a>
-<a name="205"><span class="lineNum">     205 </span>            : /// For example, when [target] = 1 and [length] = 3 you get</a>
-<a name="206"><span class="lineNum">     206 </span>            : /// (the order is not guaranteed):</a>
-<a name="207"><span class="lineNum">     207 </span>            : /// ```</a>
-<a name="208"><span class="lineNum">     208 </span>            : /// [</a>
-<a name="209"><span class="lineNum">     209 </span>            : ///   (0x000, 0x010),</a>
-<a name="210"><span class="lineNum">     210 </span>            : ///   (0x001, 0x011),</a>
-<a name="211"><span class="lineNum">     211 </span>            : ///   (0x100, 0x110),</a>
-<a name="212"><span class="lineNum">     212 </span>            : ///   (0x101, 0x111)</a>
-<a name="213"><span class="lineNum">     213 </span>            : /// ]</a>
-<a name="214"><span class="lineNum">     214 </span>            : /// ```</a>
-<a name="215"><span class="lineNum">     215 </span>            : /// </a>
-<a name="216"><span class="lineNum">     216 </span>            : /// The indexes are zero based and start from the left. That means</a>
-<a name="217"><span class="lineNum">     217 </span>            : /// when [target]=0 and [length]=3 you get:</a>
-<a name="218"><span class="lineNum">     218 </span>            : /// ```</a>
-<a name="219"><span class="lineNum">     219 </span>            : /// [</a>
-<a name="220"><span class="lineNum">     220 </span>            : ///   (0x000, 0x100),</a>
-<a name="221"><span class="lineNum">     221 </span>            : ///   (0x001, 0x101),</a>
-<a name="222"><span class="lineNum">     222 </span>            : ///   (0x010, 0x110),</a>
-<a name="223"><span class="lineNum">     223 </span>            : ///   (0x011, 0x111)</a>
-<a name="224"><span class="lineNum">     224 </span>            : /// ]</a>
-<a name="225"><span class="lineNum">     225 </span>            : /// ```</a>
-<a name="226"><span class="lineNum">     226 </span>            : /// </a>
-<a name="227"><span class="lineNum">     227 </span>            : /// The other parameters can be used to remove some pairs from the</a>
-<a name="228"><span class="lineNum">     228 </span>            : /// iterator. For each integer in [controls] we restrict the tuples</a>
-<a name="229"><span class="lineNum">     229 </span>            : /// to pairs where those indexes are 1. For example when</a>
-<a name="230"><span class="lineNum">     230 </span>            : /// [length]=3, [target]=0, and [controls] contains only 1 then we cut</a>
-<a name="231"><span class="lineNum">     231 </span>            : /// the list in half and have:</a>
-<a name="232"><span class="lineNum">     232 </span>            : /// ```</a>
-<a name="233"><span class="lineNum">     233 </span>            : /// [</a>
-<a name="234"><span class="lineNum">     234 </span>            : ///   (0x010, 0x110),</a>
-<a name="235"><span class="lineNum">     235 </span>            : ///   (0x011, 0x111)</a>
-<a name="236"><span class="lineNum">     236 </span>            : /// ]</a>
-<a name="237"><span class="lineNum">     237 </span>            : /// ```</a>
-<a name="238"><span class="lineNum">     238 </span>            : /// </a>
-<a name="239"><span class="lineNum">     239 </span>            : /// In a similar fashion [anticontrols] can be used to limit to</a>
-<a name="240"><span class="lineNum">     240 </span>            : /// tuples where the output pairs are zero at the given indices.</a>
-<a name="241"><span class="lineNum">     241 </span>            : /// </a>
-<a name="242"><span class="lineNum">     242 </span>            : /// It is an error for [target] to be contained in either [controls]</a>
-<a name="243"><span class="lineNum">     243 </span>            : /// or [anticontrols].</a>
-<a name="244"><span class="lineNum">     244 </span><span class="lineCov">          3 : Iterable&lt;IntTuple&gt; indexes({@required int target, @required int length, List&lt;int&gt; controls = const [], List&lt;int&gt; anticontrols = const [],}) sync* {</span></a>
-<a name="245"><span class="lineNum">     245 </span><span class="lineCov">          9 :   for (final i in range(0, pow(2, length-1))) {</span></a>
-<a name="246"><span class="lineNum">     246 </span><span class="lineCov">          9 :     final s = i.toRadixString(2).padLeft(length - 1, &quot;0&quot;);</span></a>
-<a name="247"><span class="lineNum">     247 </span>            :     </a>
-<a name="248"><span class="lineNum">     248 </span><span class="lineCov">         15 :     final zero = length == 1 ? &quot;0&quot; : s.substring(0, target) + &quot;0&quot; + s.substring(target);</span></a>
-<a name="249"><span class="lineNum">     249 </span><span class="lineCov">         15 :     final one = length == 1 ? &quot;1&quot; : s.substring(0, target) + &quot;1&quot; + s.substring(target);</span></a>
-<a name="250"><span class="lineNum">     250 </span><span class="lineCov">          6 :     final controlled = controls.every((ix) {</span></a>
-<a name="251"><span class="lineNum">     251 </span><span class="lineCov">          6 :       return zero[ix] == &quot;1&quot;;</span></a>
-<a name="252"><span class="lineNum">     252 </span>            :     });</a>
-<a name="253"><span class="lineNum">     253 </span><span class="lineCov">          3 :     if (controlled == false) continue;</span></a>
-<a name="254"><span class="lineNum">     254 </span><span class="lineCov">          3 :     final anti = anticontrols.every((ix) {</span></a>
-<a name="255"><span class="lineNum">     255 </span><span class="lineNoCov">          0 :       return zero[ix] == &quot;0&quot;;</span></a>
-<a name="256"><span class="lineNum">     256 </span>            :     });</a>
-<a name="257"><span class="lineNum">     257 </span><span class="lineCov">          3 :     if (anti == false) continue;</span></a>
-<a name="258"><span class="lineNum">     258 </span><span class="lineCov">          9 :     yield IntTuple(one: int.parse(one, radix: 2), zero: int.parse(zero, radix: 2));</span></a>
-<a name="259"><span class="lineNum">     259 </span>            :   }</a>
-<a name="260"><span class="lineNum">     260 </span>            : }</a>
-<a name="261"><span class="lineNum">     261 </span>            : </a>
-<a name="262"><span class="lineNum">     262 </span>            : class IntTuple extends Tuple&lt;int, int&gt; {</a>
-<a name="263"><span class="lineNum">     263 </span><span class="lineCov">          6 :   IntTuple({int one, int zero}): super(one: one, zero: zero);</span></a>
-<a name="264"><span class="lineNum">     264 </span>            : </a>
-<a name="265"><span class="lineNum">     265 </span><span class="lineNoCov">          0 :   @override</span></a>
-<a name="266"><span class="lineNum">     266 </span>            :   String toString() {</a>
-<a name="267"><span class="lineNum">     267 </span><span class="lineNoCov">          0 :     return &quot;(${zero.toRadixString(2)}, ${one.toRadixString(2)})&quot;;</span></a>
-<a name="268"><span class="lineNum">     268 </span>            :   }</a>
-<a name="269"><span class="lineNum">     269 </span>            : </a>
-<a name="270"><span class="lineNum">     270 </span><span class="lineNoCov">          0 :   int get hashCode {</span></a>
-<a name="271"><span class="lineNum">     271 </span><span class="lineNoCov">          0 :     return one.hashCode + zero.hashCode;</span></a>
-<a name="272"><span class="lineNum">     272 </span>            :   }</a>
-<a name="273"><span class="lineNum">     273 </span>            : </a>
-<a name="274"><span class="lineNum">     274 </span><span class="lineCov">          1 :   operator==(dynamic o) {</span></a>
-<a name="275"><span class="lineNum">     275 </span><span class="lineCov">          1 :     if (o is IntTuple) {</span></a>
-<a name="276"><span class="lineNum">     276 </span>            :       final IntTuple other = o;</a>
-<a name="277"><span class="lineNum">     277 </span>            :       if (other == null) return false;</a>
-<a name="278"><span class="lineNum">     278 </span><span class="lineCov">          6 :       return this.one == other.one &amp;&amp; this.zero == other.zero;</span></a>
-<a name="279"><span class="lineNum">     279 </span>            :     }</a>
-<a name="280"><span class="lineNum">     280 </span>            :     return false;</a>
-<a name="281"><span class="lineNum">     281 </span>            :   }</a>
-<a name="282"><span class="lineNum">     282 </span>            : }</a>
-<a name="283"><span class="lineNum">     283 </span>            : </a>
-<a name="284"><span class="lineNum">     284 </span><span class="lineCov">          3 : Iterable&lt;int&gt; range(int start, int end) sync* {</span></a>
-<a name="285"><span class="lineNum">     285 </span><span class="lineCov">          6 :   for (int i = start; i &lt; end; i++) {</span></a>
-<a name="286"><span class="lineNum">     286 </span>            :     yield i;</a>
-<a name="287"><span class="lineNum">     287 </span>            :   }</a>
-<a name="288"><span class="lineNum">     288 </span>            : }</a>
-<a name="289"><span class="lineNum">     289 </span>            : </a>
-<a name="290"><span class="lineNum">     290 </span>            : typedef Operator = ComplexTuple Function(ComplexTuple);</a>
-<a name="291"><span class="lineNum">     291 </span>            : </a>
-<a name="292"><span class="lineNum">     292 </span><span class="lineCov">         12 : final Operator X = (input) =&gt; ComplexTuple(zero: input.one, one: input.zero);</span></a>
-<a name="293"><span class="lineNum">     293 </span><span class="lineCov">         18 : final Operator Y = (input) =&gt; ComplexTuple(zero: -Complex.I * input.one, one: Complex.I * input.zero);</span></a>
-<a name="294"><span class="lineNum">     294 </span><span class="lineCov">         21 : final Operator Z = (input) =&gt; ComplexTuple(zero: input.zero, one: -input.one);</span></a>
-<a name="295"><span class="lineNum">     295 </span><span class="lineCov">         42 : final Operator H = (input) =&gt; ComplexTuple(zero: (input.zero + input.one) / sqrt(2.0), one: (input.zero - input.one) / sqrt(2.0));</span></a>
-<a name="296"><span class="lineNum">     296 </span><span class="lineNoCov">          0 : final Operator I = (input) =&gt; ComplexTuple(zero: input.zero, one: input.one);</span></a>
-<a name="297"><span class="lineNum">     297 </span>            : </a>
-<a name="298"><span class="lineNum">     298 </span><span class="lineNoCov">          0 : final Operator Function(double) rx = (theta) {</span></a>
-<a name="299"><span class="lineNum">     299 </span>            :   return (input) {</a>
-<a name="300"><span class="lineNum">     300 </span>            :     return ComplexTuple(</a>
-<a name="301"><span class="lineNum">     301 </span>            :       zero: input.zero * cos(theta / 2) - input.one * Complex.I * sin(theta / 2), </a>
-<a name="302"><span class="lineNum">     302 </span>            :       one: input.one * cos(theta / 2) - input.zero * Complex.I * sin(theta / 2),</a>
-<a name="303"><span class="lineNum">     303 </span>            :     );</a>
-<a name="304"><span class="lineNum">     304 </span>            :   };</a>
-<a name="305"><span class="lineNum">     305 </span>            : };</a>
+<a name="150"><span class="lineNum">     150 </span><span class="lineCov">          1 :     final zeroProbability = zeroVector.normSquared();</span></a>
+<a name="151"><span class="lineNum">     151 </span>            : </a>
+<a name="152"><span class="lineNum">     152 </span><span class="lineCov">          1 :     final r = _generator();</span></a>
+<a name="153"><span class="lineNum">     153 </span><span class="lineCov">          1 :     if (r &lt; zeroProbability) {</span></a>
+<a name="154"><span class="lineNum">     154 </span><span class="lineCov">          3 :       _data = zeroVector.normalized().elements;</span></a>
+<a name="155"><span class="lineNum">     155 </span>            :       return Measurement.Zero;</a>
+<a name="156"><span class="lineNum">     156 </span>            :     } else {</a>
+<a name="157"><span class="lineNum">     157 </span><span class="lineCov">          1 :       oneVector.normalized();</span></a>
+<a name="158"><span class="lineNum">     158 </span><span class="lineCov">          3 :       _data = oneVector.normalized().elements;</span></a>
+<a name="159"><span class="lineNum">     159 </span>            :       return Measurement.One;</a>
+<a name="160"><span class="lineNum">     160 </span>            :     }</a>
+<a name="161"><span class="lineNum">     161 </span>            :   }</a>
+<a name="162"><span class="lineNum">     162 </span>            : </a>
+<a name="163"><span class="lineNum">     163 </span><span class="lineCov">          1 :   Complex _zeroEigenvalue(List&lt;MeasurableOperator&gt; operators) {</span></a>
+<a name="164"><span class="lineNum">     164 </span><span class="lineCov">          2 :     if (operators.length == 1) {</span></a>
+<a name="165"><span class="lineNum">     165 </span><span class="lineCov">          2 :       return operators[0].eigenvalue1;</span></a>
+<a name="166"><span class="lineNum">     166 </span>            :     }</a>
+<a name="167"><span class="lineNum">     167 </span><span class="lineCov">          6 :     final allSimple = operators.map((f) =&gt; f.eigenvalue1 == Complex.ONE).reduce((a, b) =&gt; a &amp;&amp; b);</span></a>
+<a name="168"><span class="lineNum">     168 </span><span class="lineNoCov">          0 :     assert(allSimple);</span></a>
+<a name="169"><span class="lineNum">     169 </span>            :     return Complex.ONE;</a>
+<a name="170"><span class="lineNum">     170 </span>            :   }</a>
+<a name="171"><span class="lineNum">     171 </span>            : </a>
+<a name="172"><span class="lineNum">     172 </span><span class="lineCov">          1 :   Complex _oneEigenvalue(List&lt;MeasurableOperator&gt; operators) {</span></a>
+<a name="173"><span class="lineNum">     173 </span><span class="lineCov">          2 :     if (operators.length == 1) {</span></a>
+<a name="174"><span class="lineNum">     174 </span><span class="lineCov">          2 :       return operators[0].eigenvalue2;</span></a>
+<a name="175"><span class="lineNum">     175 </span>            :     }</a>
+<a name="176"><span class="lineNum">     176 </span><span class="lineCov">          7 :     final allSimple = operators.map((f) =&gt; f.eigenvalue2 == -Complex.ONE).reduce((a, b) =&gt; a &amp;&amp; b);</span></a>
+<a name="177"><span class="lineNum">     177 </span><span class="lineNoCov">          0 :     assert(allSimple);</span></a>
+<a name="178"><span class="lineNum">     178 </span><span class="lineCov">          1 :     return -Complex.ONE;</span></a>
+<a name="179"><span class="lineNum">     179 </span>            :   }</a>
+<a name="180"><span class="lineNum">     180 </span>            : </a>
+<a name="181"><span class="lineNum">     181 </span><span class="lineCov">          3 :   @visibleForTesting</span></a>
+<a name="182"><span class="lineNum">     182 </span>            :   bool operator ==(Object other) {</a>
+<a name="183"><span class="lineNum">     183 </span>            :     if (identical(this, other)) {</a>
+<a name="184"><span class="lineNum">     184 </span>            :       return true;</a>
+<a name="185"><span class="lineNum">     185 </span>            :     }</a>
+<a name="186"><span class="lineNum">     186 </span><span class="lineCov">          3 :     if (other is Bank) {</span></a>
+<a name="187"><span class="lineNum">     187 </span><span class="lineCov">          2 :       return _listEquality(other._data);</span></a>
+<a name="188"><span class="lineNum">     188 </span><span class="lineCov">          3 :     } else if (other is List&lt;Complex&gt;) { </span></a>
+<a name="189"><span class="lineNum">     189 </span><span class="lineCov">          3 :       return _listEquality(other);</span></a>
+<a name="190"><span class="lineNum">     190 </span><span class="lineCov">          2 :     } else if (other is List&lt;double&gt;) { </span></a>
+<a name="191"><span class="lineNum">     191 </span>            :       final List&lt;double&gt; data = other;</a>
+<a name="192"><span class="lineNum">     192 </span><span class="lineCov">          4 :       final norm = zip(data, this._data).map((tuple) {</span></a>
+<a name="193"><span class="lineNum">     193 </span><span class="lineCov">          5 :         return (Complex(tuple.zero) - tuple.one).abs();</span></a>
+<a name="194"><span class="lineNum">     194 </span><span class="lineCov">          3 :       }).reduce((a, b) =&gt; a + b);</span></a>
+<a name="195"><span class="lineNum">     195 </span><span class="lineCov">          1 :       return norm &lt; 1e-6;</span></a>
+<a name="196"><span class="lineNum">     196 </span><span class="lineCov">          2 :     } else if (other is Map&lt;String, Complex&gt;) {</span></a>
+<a name="197"><span class="lineNum">     197 </span><span class="lineNoCov">          0 :       var comp = Map&lt;int, Complex&gt;();</span></a>
+<a name="198"><span class="lineNum">     198 </span><span class="lineNoCov">          0 :       for (final key in other.keys) {</span></a>
+<a name="199"><span class="lineNum">     199 </span><span class="lineNoCov">          0 :         final value = int.tryParse(key, radix: 2);</span></a>
+<a name="200"><span class="lineNum">     200 </span>            :         if (value == null) return false;</a>
+<a name="201"><span class="lineNum">     201 </span><span class="lineNoCov">          0 :         comp[value] = other[key];</span></a>
+<a name="202"><span class="lineNum">     202 </span>            :       }</a>
+<a name="203"><span class="lineNum">     203 </span><span class="lineNoCov">          0 :       return _mapEquality(comp);</span></a>
+<a name="204"><span class="lineNum">     204 </span><span class="lineCov">          2 :     } else if (other is Map&lt;int, Complex&gt;) {</span></a>
+<a name="205"><span class="lineNum">     205 </span><span class="lineCov">          2 :       return _mapEquality(other);</span></a>
+<a name="206"><span class="lineNum">     206 </span><span class="lineCov">          1 :     } else if (other is Map&lt;int, double&gt;) {</span></a>
+<a name="207"><span class="lineNum">     207 </span><span class="lineCov">          2 :       var comp = other.map((ix, db) {</span></a>
+<a name="208"><span class="lineNum">     208 </span><span class="lineCov">          2 :         return MapEntry&lt;int, Complex&gt;(ix, Complex(db));</span></a>
+<a name="209"><span class="lineNum">     209 </span>            :       });</a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineCov">          1 :       return _mapEquality(comp);</span></a>
+<a name="211"><span class="lineNum">     211 </span>            :     } else {</a>
+<a name="212"><span class="lineNum">     212 </span>            :       return false;</a>
+<a name="213"><span class="lineNum">     213 </span>            :     }</a>
+<a name="214"><span class="lineNum">     214 </span>            :   }</a>
+<a name="215"><span class="lineNum">     215 </span>            : </a>
+<a name="216"><span class="lineNum">     216 </span><span class="lineCov">          3 :   bool _listEquality(List&lt;Complex&gt; other) {</span></a>
+<a name="217"><span class="lineNum">     217 </span>            :     final List&lt;Complex&gt; data = other;</a>
+<a name="218"><span class="lineNum">     218 </span><span class="lineCov">         12 :       final norm = zip(data, this._data).map((tuple) {</span></a>
+<a name="219"><span class="lineNum">     219 </span><span class="lineCov">         12 :         return (tuple.zero - tuple.one).abs();</span></a>
+<a name="220"><span class="lineNum">     220 </span><span class="lineCov">          9 :       }).reduce((a, b) =&gt; a + b);</span></a>
+<a name="221"><span class="lineNum">     221 </span><span class="lineCov">          3 :       return norm &lt; 1e-6;</span></a>
+<a name="222"><span class="lineNum">     222 </span>            :   }</a>
+<a name="223"><span class="lineNum">     223 </span>            : </a>
+<a name="224"><span class="lineNum">     224 </span><span class="lineCov">          2 :   bool _mapEquality(Map&lt;int, Complex&gt; other) {</span></a>
+<a name="225"><span class="lineNum">     225 </span><span class="lineCov">          6 :     final norm = other.keys.map((key) {</span></a>
+<a name="226"><span class="lineNum">     226 </span><span class="lineCov">         10 :       return (other[key] - this._data[key]).abs();</span></a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineCov">          4 :     }).reduce((a,b) =&gt; a+b);</span></a>
+<a name="228"><span class="lineNum">     228 </span><span class="lineCov">          2 :     return norm &lt; 1e-6;</span></a>
+<a name="229"><span class="lineNum">     229 </span>            :   }</a>
+<a name="230"><span class="lineNum">     230 </span>            : </a>
+<a name="231"><span class="lineNum">     231 </span><span class="lineNoCov">          0 :   @visibleForTesting</span></a>
+<a name="232"><span class="lineNum">     232 </span>            :   int get hashCode {</a>
+<a name="233"><span class="lineNum">     233 </span><span class="lineNoCov">          0 :     if (this._data.length == 0) { return 0; }</span></a>
+<a name="234"><span class="lineNum">     234 </span><span class="lineNoCov">          0 :     return this._data.map((f) =&gt; f.hashCode).reduce((i,j) =&gt; i+j);</span></a>
+<a name="235"><span class="lineNum">     235 </span>            :   }</a>
+<a name="236"><span class="lineNum">     236 </span>            : }</a>
+<a name="237"><span class="lineNum">     237 </span>            : </a>
+<a name="238"><span class="lineNum">     238 </span>            : /// Creates an iterator over boolean integers.</a>
+<a name="239"><span class="lineNum">     239 </span>            : /// </a>
+<a name="240"><span class="lineNum">     240 </span>            : /// This method returns all integers of boolean [length]</a>
+<a name="241"><span class="lineNum">     241 </span>            : /// paired up with the [target] index being |0&gt; or |1&gt;.</a>
+<a name="242"><span class="lineNum">     242 </span>            : /// For example, when [target] = 1 and [length] = 3 you get</a>
+<a name="243"><span class="lineNum">     243 </span>            : /// (the order is not guaranteed):</a>
+<a name="244"><span class="lineNum">     244 </span>            : /// ```</a>
+<a name="245"><span class="lineNum">     245 </span>            : /// [</a>
+<a name="246"><span class="lineNum">     246 </span>            : ///   (0x000, 0x010),</a>
+<a name="247"><span class="lineNum">     247 </span>            : ///   (0x001, 0x011),</a>
+<a name="248"><span class="lineNum">     248 </span>            : ///   (0x100, 0x110),</a>
+<a name="249"><span class="lineNum">     249 </span>            : ///   (0x101, 0x111)</a>
+<a name="250"><span class="lineNum">     250 </span>            : /// ]</a>
+<a name="251"><span class="lineNum">     251 </span>            : /// ```</a>
+<a name="252"><span class="lineNum">     252 </span>            : /// </a>
+<a name="253"><span class="lineNum">     253 </span>            : /// The indexes are zero based and start from the left. That means</a>
+<a name="254"><span class="lineNum">     254 </span>            : /// when [target]=0 and [length]=3 you get:</a>
+<a name="255"><span class="lineNum">     255 </span>            : /// ```</a>
+<a name="256"><span class="lineNum">     256 </span>            : /// [</a>
+<a name="257"><span class="lineNum">     257 </span>            : ///   (0x000, 0x100),</a>
+<a name="258"><span class="lineNum">     258 </span>            : ///   (0x001, 0x101),</a>
+<a name="259"><span class="lineNum">     259 </span>            : ///   (0x010, 0x110),</a>
+<a name="260"><span class="lineNum">     260 </span>            : ///   (0x011, 0x111)</a>
+<a name="261"><span class="lineNum">     261 </span>            : /// ]</a>
+<a name="262"><span class="lineNum">     262 </span>            : /// ```</a>
+<a name="263"><span class="lineNum">     263 </span>            : /// </a>
+<a name="264"><span class="lineNum">     264 </span>            : /// The other parameters can be used to remove some pairs from the</a>
+<a name="265"><span class="lineNum">     265 </span>            : /// iterator. For each integer in [controls] we restrict the tuples</a>
+<a name="266"><span class="lineNum">     266 </span>            : /// to pairs where those indexes are 1. For example when</a>
+<a name="267"><span class="lineNum">     267 </span>            : /// [length]=3, [target]=0, and [controls] contains only 1 then we cut</a>
+<a name="268"><span class="lineNum">     268 </span>            : /// the list in half and have:</a>
+<a name="269"><span class="lineNum">     269 </span>            : /// ```</a>
+<a name="270"><span class="lineNum">     270 </span>            : /// [</a>
+<a name="271"><span class="lineNum">     271 </span>            : ///   (0x010, 0x110),</a>
+<a name="272"><span class="lineNum">     272 </span>            : ///   (0x011, 0x111)</a>
+<a name="273"><span class="lineNum">     273 </span>            : /// ]</a>
+<a name="274"><span class="lineNum">     274 </span>            : /// ```</a>
+<a name="275"><span class="lineNum">     275 </span>            : /// </a>
+<a name="276"><span class="lineNum">     276 </span>            : /// In a similar fashion [anticontrols] can be used to limit to</a>
+<a name="277"><span class="lineNum">     277 </span>            : /// tuples where the output pairs are zero at the given indices.</a>
+<a name="278"><span class="lineNum">     278 </span>            : /// </a>
+<a name="279"><span class="lineNum">     279 </span>            : /// It is an error for [target] to be contained in either [controls]</a>
+<a name="280"><span class="lineNum">     280 </span>            : /// or [anticontrols].</a>
+<a name="281"><span class="lineNum">     281 </span><span class="lineCov">          3 : Iterable&lt;IntTuple&gt; indexes({@required int target, @required int length, List&lt;int&gt; controls = const [], List&lt;int&gt; anticontrols = const [],}) sync* {</span></a>
+<a name="282"><span class="lineNum">     282 </span><span class="lineCov">          9 :   for (final i in range(0, pow(2, length-1))) {</span></a>
+<a name="283"><span class="lineNum">     283 </span><span class="lineCov">          9 :     final s = i.toRadixString(2).padLeft(length - 1, &quot;0&quot;);</span></a>
+<a name="284"><span class="lineNum">     284 </span>            :     </a>
+<a name="285"><span class="lineNum">     285 </span><span class="lineCov">         15 :     final zero = length == 1 ? &quot;0&quot; : s.substring(0, target) + &quot;0&quot; + s.substring(target);</span></a>
+<a name="286"><span class="lineNum">     286 </span><span class="lineCov">         15 :     final one = length == 1 ? &quot;1&quot; : s.substring(0, target) + &quot;1&quot; + s.substring(target);</span></a>
+<a name="287"><span class="lineNum">     287 </span><span class="lineCov">          6 :     final controlled = controls.every((ix) {</span></a>
+<a name="288"><span class="lineNum">     288 </span><span class="lineCov">          6 :       return zero[ix] == &quot;1&quot;;</span></a>
+<a name="289"><span class="lineNum">     289 </span>            :     });</a>
+<a name="290"><span class="lineNum">     290 </span><span class="lineCov">          3 :     if (controlled == false) continue;</span></a>
+<a name="291"><span class="lineNum">     291 </span><span class="lineCov">          3 :     final anti = anticontrols.every((ix) {</span></a>
+<a name="292"><span class="lineNum">     292 </span><span class="lineNoCov">          0 :       return zero[ix] == &quot;0&quot;;</span></a>
+<a name="293"><span class="lineNum">     293 </span>            :     });</a>
+<a name="294"><span class="lineNum">     294 </span><span class="lineCov">          3 :     if (anti == false) continue;</span></a>
+<a name="295"><span class="lineNum">     295 </span><span class="lineCov">          9 :     yield IntTuple(one: int.parse(one, radix: 2), zero: int.parse(zero, radix: 2));</span></a>
+<a name="296"><span class="lineNum">     296 </span>            :   }</a>
+<a name="297"><span class="lineNum">     297 </span>            : }</a>
+<a name="298"><span class="lineNum">     298 </span>            : </a>
+<a name="299"><span class="lineNum">     299 </span>            : class IntTuple extends Tuple&lt;int, int&gt; {</a>
+<a name="300"><span class="lineNum">     300 </span><span class="lineCov">          6 :   IntTuple({int one, int zero}): super(one: one, zero: zero);</span></a>
+<a name="301"><span class="lineNum">     301 </span>            : </a>
+<a name="302"><span class="lineNum">     302 </span><span class="lineNoCov">          0 :   @override</span></a>
+<a name="303"><span class="lineNum">     303 </span>            :   String toString() {</a>
+<a name="304"><span class="lineNum">     304 </span><span class="lineNoCov">          0 :     return &quot;(${zero.toRadixString(2)}, ${one.toRadixString(2)})&quot;;</span></a>
+<a name="305"><span class="lineNum">     305 </span>            :   }</a>
 <a name="306"><span class="lineNum">     306 </span>            : </a>
-<a name="307"><span class="lineNum">     307 </span><span class="lineNoCov">          0 : final Operator Function(double) ry = (theta) {</span></a>
-<a name="308"><span class="lineNum">     308 </span>            :   return (input) {</a>
-<a name="309"><span class="lineNum">     309 </span>            :     return ComplexTuple(</a>
-<a name="310"><span class="lineNum">     310 </span>            :       zero: input.zero * cos(theta / 2) - input.one * sin(theta / 2), </a>
-<a name="311"><span class="lineNum">     311 </span>            :       one: input.one * cos(theta / 2) + input.zero * sin(theta / 2),</a>
-<a name="312"><span class="lineNum">     312 </span>            :     );</a>
-<a name="313"><span class="lineNum">     313 </span>            :   };</a>
-<a name="314"><span class="lineNum">     314 </span>            : };</a>
-<a name="315"><span class="lineNum">     315 </span>            : </a>
-<a name="316"><span class="lineNum">     316 </span><span class="lineNoCov">          0 : final Operator Function(double) rz = (theta) {</span></a>
-<a name="317"><span class="lineNum">     317 </span>            :   return (input) {</a>
-<a name="318"><span class="lineNum">     318 </span>            :     return ComplexTuple(</a>
-<a name="319"><span class="lineNum">     319 </span>            :       zero: input.zero * (Complex.ONE * cos(theta / 2) - Complex.I * sin(theta / 2)), </a>
-<a name="320"><span class="lineNum">     320 </span>            :       one: input.one * (Complex.ONE * cos(theta / 2) + Complex.I * sin(theta / 2)),</a>
-<a name="321"><span class="lineNum">     321 </span>            :     );</a>
-<a name="322"><span class="lineNum">     322 </span>            :   };</a>
-<a name="323"><span class="lineNum">     323 </span>            : };</a>
-<a name="324"><span class="lineNum">     324 </span>            : </a>
-<a name="325"><span class="lineNum">     325 </span>            : class ComplexTuple extends Tuple&lt;Complex, Complex&gt; {</a>
-<a name="326"><span class="lineNum">     326 </span><span class="lineCov">          6 :   ComplexTuple({Complex one, Complex zero}): super(one: one, zero: zero);</span></a>
-<a name="327"><span class="lineNum">     327 </span>            : }</a>
-<a name="328"><span class="lineNum">     328 </span>            : </a>
-<a name="329"><span class="lineNum">     329 </span><span class="lineCov">          6 : enum Measurement {</span></a>
-<a name="330"><span class="lineNum">     330 </span><span class="lineCov">          3 :   Zero,</span></a>
-<a name="331"><span class="lineNum">     331 </span><span class="lineCov">          3 :   One</span></a>
-<a name="332"><span class="lineNum">     332 </span>            : }</a>
-<a name="333"><span class="lineNum">     333 </span>            : </a>
+<a name="307"><span class="lineNum">     307 </span><span class="lineNoCov">          0 :   int get hashCode {</span></a>
+<a name="308"><span class="lineNum">     308 </span><span class="lineNoCov">          0 :     return one.hashCode + zero.hashCode;</span></a>
+<a name="309"><span class="lineNum">     309 </span>            :   }</a>
+<a name="310"><span class="lineNum">     310 </span>            : </a>
+<a name="311"><span class="lineNum">     311 </span><span class="lineCov">          1 :   operator==(dynamic o) {</span></a>
+<a name="312"><span class="lineNum">     312 </span><span class="lineCov">          1 :     if (o is IntTuple) {</span></a>
+<a name="313"><span class="lineNum">     313 </span>            :       final IntTuple other = o;</a>
+<a name="314"><span class="lineNum">     314 </span>            :       if (other == null) return false;</a>
+<a name="315"><span class="lineNum">     315 </span><span class="lineCov">          6 :       return this.one == other.one &amp;&amp; this.zero == other.zero;</span></a>
+<a name="316"><span class="lineNum">     316 </span>            :     }</a>
+<a name="317"><span class="lineNum">     317 </span>            :     return false;</a>
+<a name="318"><span class="lineNum">     318 </span>            :   }</a>
+<a name="319"><span class="lineNum">     319 </span>            : }</a>
+<a name="320"><span class="lineNum">     320 </span>            : </a>
+<a name="321"><span class="lineNum">     321 </span><span class="lineCov">          3 : Iterable&lt;int&gt; range(int start, int end) sync* {</span></a>
+<a name="322"><span class="lineNum">     322 </span><span class="lineCov">          6 :   for (int i = start; i &lt; end; i++) {</span></a>
+<a name="323"><span class="lineNum">     323 </span>            :     yield i;</a>
+<a name="324"><span class="lineNum">     324 </span>            :   }</a>
+<a name="325"><span class="lineNum">     325 </span>            : }</a>
+<a name="326"><span class="lineNum">     326 </span>            : </a>
+<a name="327"><span class="lineNum">     327 </span>            : class MeasurableOperator {</a>
+<a name="328"><span class="lineNum">     328 </span>            :   final Operator operator;</a>
+<a name="329"><span class="lineNum">     329 </span>            :   final Complex eigenvalue1;</a>
+<a name="330"><span class="lineNum">     330 </span>            :   final Complex eigenvalue2;</a>
+<a name="331"><span class="lineNum">     331 </span>            : </a>
+<a name="332"><span class="lineNum">     332 </span><span class="lineCov">          1 :   MeasurableOperator({this.operator, this.eigenvalue1, this.eigenvalue2});</span></a>
+<a name="333"><span class="lineNum">     333 </span>            : }</a>
 <a name="334"><span class="lineNum">     334 </span>            : </a>
-<a name="335"><span class="lineNum">     335 </span>            : </a>
+<a name="335"><span class="lineNum">     335 </span>            : final double pi = 3.141592653589793238462643383279502884197169399375105820974944;</a>
+<a name="336"><span class="lineNum">     336 </span><span class="lineCov">          5 : final mx = MeasurableOperator(operator: X, eigenvalue1: Complex.ONE, eigenvalue2: -Complex.ONE);</span></a>
+<a name="337"><span class="lineNum">     337 </span><span class="lineNoCov">          0 : final my = MeasurableOperator(operator: Y, eigenvalue1: Complex.ONE, eigenvalue2: -Complex.ONE);</span></a>
+<a name="338"><span class="lineNum">     338 </span><span class="lineCov">          5 : final mz = MeasurableOperator(operator: Z, eigenvalue1: Complex.ONE, eigenvalue2: -Complex.ONE);</span></a>
+<a name="339"><span class="lineNum">     339 </span><span class="lineNoCov">          0 : final mh = MeasurableOperator(operator: H, eigenvalue1: Complex.ONE, eigenvalue2: -Complex.ONE);</span></a>
+<a name="340"><span class="lineNum">     340 </span><span class="lineCov">          4 : final mrx = (double theta) =&gt; MeasurableOperator(</span></a>
+<a name="341"><span class="lineNum">     341 </span><span class="lineCov">          2 :   operator: rx(theta), </span></a>
+<a name="342"><span class="lineNum">     342 </span><span class="lineCov">          2 :   eigenvalue1: Complex.polar(1, theta / 2), </span></a>
+<a name="343"><span class="lineNum">     343 </span><span class="lineCov">          3 :   eigenvalue2: Complex.polar(1, -theta / 2)</span></a>
+<a name="344"><span class="lineNum">     344 </span>            : );</a>
+<a name="345"><span class="lineNum">     345 </span><span class="lineCov">          4 : final mry = (double theta) =&gt; MeasurableOperator(</span></a>
+<a name="346"><span class="lineNum">     346 </span><span class="lineCov">          2 :   operator: ry(theta), </span></a>
+<a name="347"><span class="lineNum">     347 </span><span class="lineCov">          2 :   eigenvalue1: Complex.polar(1, theta / 2), </span></a>
+<a name="348"><span class="lineNum">     348 </span><span class="lineCov">          3 :   eigenvalue2: Complex.polar(1, -theta / 2)</span></a>
+<a name="349"><span class="lineNum">     349 </span>            : );</a>
+<a name="350"><span class="lineNum">     350 </span><span class="lineCov">          4 : final mrz = (double theta) =&gt; MeasurableOperator(</span></a>
+<a name="351"><span class="lineNum">     351 </span><span class="lineCov">          2 :   operator: rz(theta), </span></a>
+<a name="352"><span class="lineNum">     352 </span><span class="lineCov">          2 :   eigenvalue1: Complex.polar(1, theta / 2), </span></a>
+<a name="353"><span class="lineNum">     353 </span><span class="lineCov">          3 :   eigenvalue2: Complex.polar(1, -theta / 2)</span></a>
+<a name="354"><span class="lineNum">     354 </span>            : );</a>
+<a name="355"><span class="lineNum">     355 </span>            : </a>
+<a name="356"><span class="lineNum">     356 </span>            : typedef Operator = ComplexTuple Function(ComplexTuple);</a>
+<a name="357"><span class="lineNum">     357 </span>            : </a>
+<a name="358"><span class="lineNum">     358 </span><span class="lineCov">         12 : final Operator X = (input) =&gt; ComplexTuple(zero: input.one, one: input.zero);</span></a>
+<a name="359"><span class="lineNum">     359 </span><span class="lineCov">         18 : final Operator Y = (input) =&gt; ComplexTuple(zero: -Complex.I * input.one, one: Complex.I * input.zero);</span></a>
+<a name="360"><span class="lineNum">     360 </span><span class="lineCov">         21 : final Operator Z = (input) =&gt; ComplexTuple(zero: input.zero, one: -input.one);</span></a>
+<a name="361"><span class="lineNum">     361 </span><span class="lineCov">         42 : final Operator H = (input) =&gt; ComplexTuple(zero: (input.zero + input.one) / sqrt(2.0), one: (input.zero - input.one) / sqrt(2.0));</span></a>
+<a name="362"><span class="lineNum">     362 </span><span class="lineNoCov">          0 : final Operator I = (input) =&gt; ComplexTuple(zero: input.zero, one: input.one);</span></a>
+<a name="363"><span class="lineNum">     363 </span><span class="lineCov">          3 : final Operator Function(double) ri = (theta) {</span></a>
+<a name="364"><span class="lineNum">     364 </span><span class="lineCov">          1 :   return (input) {</span></a>
+<a name="365"><span class="lineNum">     365 </span><span class="lineCov">          1 :     return ComplexTuple(</span></a>
+<a name="366"><span class="lineNum">     366 </span><span class="lineCov">          3 :       zero: input.zero * Complex.polar(1, theta), </span></a>
+<a name="367"><span class="lineNum">     367 </span><span class="lineCov">          3 :       one: input.one * Complex.polar(1, theta),</span></a>
+<a name="368"><span class="lineNum">     368 </span>            :     );</a>
+<a name="369"><span class="lineNum">     369 </span>            :   };</a>
+<a name="370"><span class="lineNum">     370 </span>            : };</a>
+<a name="371"><span class="lineNum">     371 </span>            : </a>
+<a name="372"><span class="lineNum">     372 </span><span class="lineCov">          3 : final Operator Function(Complex) ci = (complex) {</span></a>
+<a name="373"><span class="lineNum">     373 </span><span class="lineCov">          3 :   assert((complex.abs() - 1) &lt; 1e-6);</span></a>
+<a name="374"><span class="lineNum">     374 </span><span class="lineCov">          1 :   return (input) {</span></a>
+<a name="375"><span class="lineNum">     375 </span><span class="lineCov">          1 :     return ComplexTuple(</span></a>
+<a name="376"><span class="lineNum">     376 </span><span class="lineCov">          2 :       zero: input.zero * complex, </span></a>
+<a name="377"><span class="lineNum">     377 </span><span class="lineCov">          2 :       one: input.one * complex,</span></a>
+<a name="378"><span class="lineNum">     378 </span>            :     );</a>
+<a name="379"><span class="lineNum">     379 </span>            :   };</a>
+<a name="380"><span class="lineNum">     380 </span>            : </a>
+<a name="381"><span class="lineNum">     381 </span>            : };</a>
+<a name="382"><span class="lineNum">     382 </span>            : </a>
+<a name="383"><span class="lineNum">     383 </span><span class="lineCov">          3 : final Operator Function(double) rx = (theta) {</span></a>
+<a name="384"><span class="lineNum">     384 </span><span class="lineCov">          1 :   return (input) {</span></a>
+<a name="385"><span class="lineNum">     385 </span><span class="lineCov">          1 :     return ComplexTuple(</span></a>
+<a name="386"><span class="lineNum">     386 </span><span class="lineCov">         10 :       zero: input.zero * cos(theta / 2) - input.one * Complex.I * sin(theta / 2), </span></a>
+<a name="387"><span class="lineNum">     387 </span><span class="lineCov">         10 :       one: input.one * cos(theta / 2) - input.zero * Complex.I * sin(theta / 2),</span></a>
+<a name="388"><span class="lineNum">     388 </span>            :     );</a>
+<a name="389"><span class="lineNum">     389 </span>            :   };</a>
+<a name="390"><span class="lineNum">     390 </span>            : };</a>
+<a name="391"><span class="lineNum">     391 </span>            : </a>
+<a name="392"><span class="lineNum">     392 </span><span class="lineCov">          3 : final Operator Function(double) ry = (theta) {</span></a>
+<a name="393"><span class="lineNum">     393 </span><span class="lineCov">          1 :   return (input) {</span></a>
+<a name="394"><span class="lineNum">     394 </span><span class="lineCov">          1 :     return ComplexTuple(</span></a>
+<a name="395"><span class="lineNum">     395 </span><span class="lineCov">          9 :       zero: input.zero * cos(theta / 2) - input.one * sin(theta / 2), </span></a>
+<a name="396"><span class="lineNum">     396 </span><span class="lineCov">          9 :       one: input.one * cos(theta / 2) + input.zero * sin(theta / 2),</span></a>
+<a name="397"><span class="lineNum">     397 </span>            :     );</a>
+<a name="398"><span class="lineNum">     398 </span>            :   };</a>
+<a name="399"><span class="lineNum">     399 </span>            : };</a>
+<a name="400"><span class="lineNum">     400 </span>            : </a>
+<a name="401"><span class="lineNum">     401 </span><span class="lineCov">          3 : final Operator Function(double) rz = (theta) {</span></a>
+<a name="402"><span class="lineNum">     402 </span><span class="lineCov">          1 :   return (input) {</span></a>
+<a name="403"><span class="lineNum">     403 </span><span class="lineCov">          1 :     return ComplexTuple(</span></a>
+<a name="404"><span class="lineNum">     404 </span><span class="lineCov">          9 :       zero: input.zero * (Complex.ONE * cos(theta / 2) - Complex.I * sin(theta / 2)), </span></a>
+<a name="405"><span class="lineNum">     405 </span><span class="lineCov">          9 :       one: input.one * (Complex.ONE * cos(theta / 2) + Complex.I * sin(theta / 2)),</span></a>
+<a name="406"><span class="lineNum">     406 </span>            :     );</a>
+<a name="407"><span class="lineNum">     407 </span>            :   };</a>
+<a name="408"><span class="lineNum">     408 </span>            : };</a>
+<a name="409"><span class="lineNum">     409 </span>            : </a>
+<a name="410"><span class="lineNum">     410 </span>            : class ComplexTuple extends Tuple&lt;Complex, Complex&gt; {</a>
+<a name="411"><span class="lineNum">     411 </span><span class="lineCov">          6 :   ComplexTuple({Complex one, Complex zero}): super(one: one, zero: zero);</span></a>
+<a name="412"><span class="lineNum">     412 </span>            : }</a>
+<a name="413"><span class="lineNum">     413 </span>            : </a>
+<a name="414"><span class="lineNum">     414 </span><span class="lineCov">          7 : enum Measurement {</span></a>
+<a name="415"><span class="lineNum">     415 </span><span class="lineCov">          3 :   Zero,</span></a>
+<a name="416"><span class="lineNum">     416 </span><span class="lineCov">          3 :   One</span></a>
+<a name="417"><span class="lineNum">     417 </span>            : }</a>
+<a name="418"><span class="lineNum">     418 </span>            : </a>
+<a name="419"><span class="lineNum">     419 </span>            : </a>
+<a name="420"><span class="lineNum">     420 </span>            : </a>
 </pre>
       </td>
     </tr>

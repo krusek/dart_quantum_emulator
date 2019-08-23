@@ -199,6 +199,16 @@ void main() {
   });
 
   group("Measurements", () {
+    test('tensor product measurement', () {
+      final bank = Bank(generator: () => 1.0);
+      final qubits = bank.borrowQubits(length:2);
+      // bank.operate(target: qubits[0], operator: H);
+      // bank.operate(target: qubits[1], operator: H);
+      final m = bank.measurement(targets: [qubits[0], qubits[1]], operators: [mx, mz]);
+      print("m: $m");
+      print("bank: $bank");
+
+    });
     test("measurement playground", () {
       final bank = Bank.create(seed: 0);
       final qubits = bank.borrowQubits(length:2);

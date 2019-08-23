@@ -360,6 +360,9 @@ final mrz = (double theta) => MeasurableOperator(
   eigenvalue1: Complex.polar(1, theta / 2), 
   eigenvalue2: Complex.polar(1, -theta / 2)
 );
+final Operator Function(int) ospecial = (n) {
+  return (input) => ComplexTuple(zero: input.zero, one: Complex.polar(1, 2 * pi / (n+1)) * input.one);
+};
 
 typedef Operator = ComplexTuple Function(ComplexTuple);
 
