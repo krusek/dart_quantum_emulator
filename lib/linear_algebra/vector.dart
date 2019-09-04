@@ -72,6 +72,10 @@ class Tuple<T,U> {
   Tuple({this.zero, this.one});
 }
 
+class ComplexTuple extends Tuple<Complex, Complex> {
+  ComplexTuple({Complex one, Complex zero}): super(one: one, zero: zero);
+}
+
 Iterable<Tuple<T,U>> zip<T, U>(Iterable<T> left, Iterable<U> right) sync* {
   final lefti = left.iterator;
   final righti = right.iterator;

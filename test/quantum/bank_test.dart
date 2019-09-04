@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:complex/complex.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quantum_emulator/quantum/bank.dart';
+import 'package:quantum_emulator/quantum/measurable_operator.dart';
+import 'package:quantum_emulator/quantum/operators.dart';
 
 class Generator {
   final List<double> elements;
