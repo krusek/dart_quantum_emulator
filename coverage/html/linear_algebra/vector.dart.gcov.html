@@ -31,13 +31,13 @@
             <td class="headerValue">lcov.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">41</td>
-            <td class="headerCovTableEntry">46</td>
-            <td class="headerCovTableEntryMed">89.1 %</td>
+            <td class="headerCovTableEntry">42</td>
+            <td class="headerCovTableEntry">47</td>
+            <td class="headerCovTableEntryMed">89.4 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2019-08-12 07:22:13</td>
+            <td class="headerValue">2019-09-04 16:51:19</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -134,13 +134,17 @@
 <a name="72"><span class="lineNum">      72 </span><span class="lineCov">          4 :   Tuple({this.zero, this.one});</span></a>
 <a name="73"><span class="lineNum">      73 </span>            : }</a>
 <a name="74"><span class="lineNum">      74 </span>            : </a>
-<a name="75"><span class="lineNum">      75 </span><span class="lineCov">          4 : Iterable&lt;Tuple&lt;T,U&gt;&gt; zip&lt;T, U&gt;(Iterable&lt;T&gt; left, Iterable&lt;U&gt; right) sync* {</span></a>
-<a name="76"><span class="lineNum">      76 </span><span class="lineCov">          4 :   final lefti = left.iterator;</span></a>
-<a name="77"><span class="lineNum">      77 </span><span class="lineCov">          4 :   final righti = right.iterator;</span></a>
-<a name="78"><span class="lineNum">      78 </span><span class="lineCov">          8 :   while (lefti.moveNext() &amp;&amp; righti.moveNext()) {</span></a>
-<a name="79"><span class="lineNum">      79 </span><span class="lineCov">         12 :     yield Tuple&lt;T,U&gt;(zero: lefti.current, one: righti.current);</span></a>
-<a name="80"><span class="lineNum">      80 </span>            :   }</a>
-<a name="81"><span class="lineNum">      81 </span>            : }</a>
+<a name="75"><span class="lineNum">      75 </span>            : class ComplexTuple extends Tuple&lt;Complex, Complex&gt; {</a>
+<a name="76"><span class="lineNum">      76 </span><span class="lineCov">          6 :   ComplexTuple({Complex one, Complex zero}): super(one: one, zero: zero);</span></a>
+<a name="77"><span class="lineNum">      77 </span>            : }</a>
+<a name="78"><span class="lineNum">      78 </span>            : </a>
+<a name="79"><span class="lineNum">      79 </span><span class="lineCov">          4 : Iterable&lt;Tuple&lt;T,U&gt;&gt; zip&lt;T, U&gt;(Iterable&lt;T&gt; left, Iterable&lt;U&gt; right) sync* {</span></a>
+<a name="80"><span class="lineNum">      80 </span><span class="lineCov">          4 :   final lefti = left.iterator;</span></a>
+<a name="81"><span class="lineNum">      81 </span><span class="lineCov">          4 :   final righti = right.iterator;</span></a>
+<a name="82"><span class="lineNum">      82 </span><span class="lineCov">          8 :   while (lefti.moveNext() &amp;&amp; righti.moveNext()) {</span></a>
+<a name="83"><span class="lineNum">      83 </span><span class="lineCov">         12 :     yield Tuple&lt;T,U&gt;(zero: lefti.current, one: righti.current);</span></a>
+<a name="84"><span class="lineNum">      84 </span>            :   }</a>
+<a name="85"><span class="lineNum">      85 </span>            : }</a>
 </pre>
       </td>
     </tr>
